@@ -53,6 +53,10 @@ ROBOTSTXT_OBEY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    'crawler.middlewares.CrawlerDownloaderMiddleware': 543,
 #}
+# DOWNLOADER_MIDDLEWARES = {
+# 'scraping_hub.middlewares.CloudFlareMiddleware': 560
+# }
+
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
@@ -86,3 +90,11 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
