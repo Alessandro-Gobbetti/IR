@@ -5,7 +5,7 @@ from scrapy_playwright.page import PageMethod
 class PatreonSpider(scrapy.Spider):
     name = 'patreon'
     start_urls = [
-        'https://www.patreon.com/search?q=python', 
+        # 'https://www.patreon.com/search?q=python', 
         'https://www.patreon.com/search?q=html'
         ]
 
@@ -19,6 +19,7 @@ class PatreonSpider(scrapy.Spider):
     }
 
     def start_requests(self):
+        """Start the requests with playwright, so we can wait for the page to load."""
         for url in self.start_urls:
             yield scrapy.Request(url, meta={
                 'playwright': True,
@@ -31,9 +32,11 @@ class PatreonSpider(scrapy.Spider):
 
 
     async def parse(self, response):
-
+        """Parse the search results page to get the artist's name, short description, image, etc."""
         page = response.meta['playwright_page']
         await page.close()
+
+        print('\033[92m' + "Parsing: " + response.url + '\033[0m')
 
         for artist in response.css('div[data-tag="campaign-result"]'):
             name = artist.css('span::text').get()
@@ -41,27 +44,26 @@ class PatreonSpider(scrapy.Spider):
             image = artist.css('div[data-tag="campaign-result-avatar"]::attr(src)').get()
             posts = artist.css('p.sc-jrQzAO.DzYUV::text').get()
             patrons = artist.css('p[data-tag="campaign-result-patron-count"]::text').get()
-            # TODO: get the rest of the data (short desc, long desc, ...)
+            short_desc = artist.css('p.sc-jrQzAO.bsIqPC::text').get()
             
-            # remove " posts" from posts
-            posts = int(posts[:-5].strip().replace(',',''))
-            if patrons: # patrons number might be missing
-                # remove " patrons" from patrons
-                patrons = int(patrons[:-7].strip().replace(',',''))
+            # parse posts and patrons as int
+            posts = int(posts[:-5].strip().replace(',','')) # remove 'posts'
+            if patrons: # patrons number might be missing (private)
+                patrons = int(patrons[:-7].strip().replace(',','')) # remove 'patrons'
 
-            yield {
+            # follow the artist's page to get the long description, pricing, etc.
+            yield scrapy.Request(url, callback=self.parse_artist, meta={
                 'name': name,
-                'url': url,
                 'image': image,
                 'posts': posts,
-                'patrons': patrons
-                }
+                'patrons': patrons,
+                'short_desc': short_desc,
+            })
 
         # the next page is the first link after the current page
         next_page = response.css('div.sc-exfcb4-1.cAQEhl + a::attr(href)').get()
 
         if next_page is not None:
-            print('\033[92m' + "Following: " + next_page + '\033[0m', end="\r")
             yield scrapy.Request(next_page, meta={
                 'playwright': True,
                 'playwright_include_page': True, 
@@ -70,6 +72,26 @@ class PatreonSpider(scrapy.Spider):
                     ],
                 'errback': self.errback,
             })
+
+
+    def parse_artist(self, response):
+        """Parse the artist's page to get the long description, pricing, etc."""
+        print('\033[90m' + "\tParsing: " + response.url + '\033[0m')
+
+        pricing = response.css('div.sc-bkkeKt.cupyBO::text').getall()
+        long_desc = response.css('div[data-tag="summary-container"] *::text').getall()
+        long_desc = ' '.join(long_desc)
+
+        yield {
+            'name': response.meta['name'],
+            'posts': response.meta['posts'],
+            'patrons': response.meta['patrons'],
+            'pricing': pricing,
+            'url': response.url,
+            'short_desc': response.meta['short_desc'],
+            'image': response.meta['image'],
+            'long_desc': long_desc,
+            }
 
 
     async def errback(self, failure):

@@ -98,3 +98,6 @@ DOWNLOAD_HANDLERS = {
 }
 
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+
+# Use utf-8 encoding to support non-ascii characters like emojis, cyrillic, etc.
+FEED_EXPORT_ENCODING = 'utf-8'
