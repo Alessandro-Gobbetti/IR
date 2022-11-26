@@ -5,8 +5,21 @@ from scrapy_playwright.page import PageMethod
 class PatreonSpider(scrapy.Spider):
     name = 'patreon'
     start_urls = [
-        # 'https://www.patreon.com/search?q=python', 
-        'https://www.patreon.com/search?q=html'
+        'https://www.patreon.com/search?q=art', 
+        'https://www.patreon.com/search?q=music',
+        'https://www.patreon.com/search?q=photography',
+        'https://www.patreon.com/search?q=writing',
+        'https://www.patreon.com/search?q=game',
+        'https://www.patreon.com/search?q=technology',
+        'https://www.patreon.com/search?q=fitness',
+        'https://www.patreon.com/search?q=cooking',
+        'https://www.patreon.com/search?q=travel',
+        'https://www.patreon.com/search?q=education',
+        'https://www.patreon.com/search?q=health',
+        'https://www.patreon.com/search?q=politic',
+        'https://www.patreon.com/search?q=podcast',
+        'https://www.patreon.com/search?q=stream',
+        'https://www.patreon.com/search?q=video',
         ]
 
     custom_settings = {
