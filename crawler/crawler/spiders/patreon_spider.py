@@ -98,21 +98,6 @@ class PatreonSpider(scrapy.Spider):
         long_desc = response.css('div[data-tag="summary-container"] *::text').getall()
         long_desc = ' '.join(long_desc)
 
-        print(artist_dict.make(
-            self.name,
-            response.url,
-            response.meta['name'],
-            response.meta['image'],
-            response.meta['short_desc'],
-            long_desc,
-            response.meta['posts'],
-            response.meta['patrons'],
-            pricing,
-            [],
-            [],
-            ""
-        ))
-
         yield artist_dict.make(
             self.name,
             response.meta['name'],
