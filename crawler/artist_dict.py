@@ -28,6 +28,7 @@ def make(site,  # Domain of scraped site
 
 def make_price_tier(amount_per_month, title, description):
     return {
+        'title' : title,
         'monthly': amount_per_month,
         'description': description,
     }
