@@ -6,17 +6,16 @@ import artist_dict
 class KoFiSpider(scrapy.Spider):
     name = 'ko-fi'
 
-    # kofitags = ['Advice', 'Animation', 'Art', 'Blogging',
-    #             'Comedy', 'Comics', 'Commissions', 'Community', 
-    #             'Cosplay', 'Crafts', 'Dance & Theatre', 'Design', 
-    #             'Drawing & Painting', 'Education', 'Food & Drink', 
-    #             'Fundraising', 'Game Development', 'Gaming', 
-    #             'Health & Fitness', 'Lifestyle', 'Money', 'Music', 
-    #             'News', 'Nsfw', 'Other', 'Photography', 'Podcast', 
-    #             'Science & Tech', 'Social', 'Software', 'Spirituality', 
-    #             'Streaming', 'Video and Film', 'Writing']
+    kofitags = ['Advice', 'Animation', 'Art', 'Blogging',
+                'Comedy', 'Comics', 'Commissions', 'Community', 
+                'Cosplay', 'Crafts', 'Dance & Theatre', 'Design', 
+                'Drawing & Painting', 'Education', 'Food & Drink', 
+                'Fundraising', 'Game Development', 'Gaming', 
+                'Health & Fitness', 'Lifestyle', 'Money', 'Music', 
+                'News', 'Nsfw', 'Other', 'Photography', 'Podcast', 
+                'Science & Tech', 'Social', 'Software', 'Spirituality', 
+                'Streaming', 'Video and Film', 'Writing']
 
-    kofitags = ['Art']
 
     # create an url for each tag
     start_urls = [f'https://ko-fi.com/explore?category={tag}' for tag in kofitags ]
@@ -80,13 +79,27 @@ class KoFiSpider(scrapy.Spider):
         name = response.css('div.kfds-text-limit-profilename-mobile span::text').get()
         supporters = response.css('span.kfds-c-profile-link-handle.kfds-font-clr-dark::text').get()
         # remove ' Supporters'
-        if supporters:
-            supporters = int(supporters[:-10].strip().replace(',', ''))
+        if supporters is not None and len(supporters) > 0:
+            supporters = supporters.split(' ')[0]
+        
+        if supporters is not None and len(supporters) > 0:  
+            # the last character may be a K or M
+            if supporters[-1].upper() == 'K':
+                supporters = supporters[:-1].strip()
+                supporters = float(supporters) * 1000
+            elif supporters[-1].upper() == 'M':
+                supporters = supporters[:-1].strip()
+                supporters = float(supporters) * 1_000_000
+            elif supporters.isdigit():
+                supporters = int(supporters)
+        else:
+            supporters = None
         
         pic = response.css('img#profilePicture::attr(src)').get()
         banner_pic = response.css('div#profile-header::attr(style)').get()
         # get the background:url(...) from the style attribute
-        banner_pic = banner_pic[banner_pic.find('background:url(')+len('background:url('):banner_pic.find(')')]
+        if banner_pic:
+            banner_pic = banner_pic[banner_pic.find('background:url(')+len('background:url('):banner_pic.find(')')]
         bio = response.css('p.kfds-c-para-control.line-breaks.break-long-words::text').get()
         tags = response.css('span.label-tag::text').getall()
         socials = response.css('div.social-profile-link a::attr(href)').getall()
