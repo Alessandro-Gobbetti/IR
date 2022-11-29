@@ -1,19 +1,19 @@
 <template>
-
+<p>sfasdfs</p>
 </template>
 
 <script>
 
 
 // Components
-import HelloWorld from '../components/HelloWorld.vue';
+// import HelloWorld from '../components/HelloWorld.vue';
 import {defineComponent} from "vue";
 
 export default defineComponent({
   name: 'HelloWorld',
 
   components: {
-    HelloWorld,
+    // HelloWorld,
   },
 });
 </script>

@@ -1,5 +1,3 @@
-# Jetbrains project
-.idea
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -129,3 +127,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# frontend
+*/node_modules/
+*/npm-debug.log*
+*/yarn-debug.log*
+*/yarn-error.log*
+*/yarn.lock
+*/package-lock.json
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
