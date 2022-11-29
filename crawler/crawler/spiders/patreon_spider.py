@@ -23,6 +23,7 @@ class PatreonSpider(scrapy.Spider):
         'https://www.patreon.com/search?q=video',
     ]
 
+
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
         "DOWNLOAD_HANDLERS": {
@@ -100,17 +101,17 @@ class PatreonSpider(scrapy.Spider):
 
         yield artist_dict.make(
             self.name,
-            response.meta['name'],
             response.url,
+            response.meta['name'],
             response.meta['image'],
             response.meta['short_desc'],
             long_desc,
             response.meta['posts'],
             response.meta['patrons'],
             pricing,
-            [],
-            [],
-            ""
+            "",
+            response.css('div[data-tag="campaign-social-links"] a[role="button"]::attr("href")').getall(),
+            ""#response.css('div[data-tag="cover-photo-container"]')
         )
 
     async def errback(self, failure):
