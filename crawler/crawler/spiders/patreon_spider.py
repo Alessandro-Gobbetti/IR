@@ -1,26 +1,15 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
+import re
 import artist_dict
 
 
 class PatreonSpider(scrapy.Spider):
     name = 'patreon'
+    stat_matcher = re.compile(r'^(\d+)')
+
     start_urls = [
         'https://www.patreon.com/search?q=art',
-        'https://www.patreon.com/search?q=music',
-        'https://www.patreon.com/search?q=photography',
-        'https://www.patreon.com/search?q=writing',
-        'https://www.patreon.com/search?q=game',
-        'https://www.patreon.com/search?q=technology',
-        'https://www.patreon.com/search?q=fitness',
-        'https://www.patreon.com/search?q=cooking',
-        'https://www.patreon.com/search?q=travel',
-        'https://www.patreon.com/search?q=education',
-        'https://www.patreon.com/search?q=health',
-        'https://www.patreon.com/search?q=politic',
-        'https://www.patreon.com/search?q=podcast',
-        'https://www.patreon.com/search?q=stream',
-        'https://www.patreon.com/search?q=video',
     ]
 
 
@@ -57,13 +46,13 @@ class PatreonSpider(scrapy.Spider):
             url = artist.css('a::attr(href)').get()
             image = artist.css('div[data-tag="campaign-result-avatar"]::attr(src)').get()
             posts = artist.css('p.sc-jrQzAO.DzYUV::text').get()
-            patrons = artist.css('p[data-tag="campaign-result-patron-count"]::text').get()
+            patrons = self.stat_matcher.search(artist.css('p[data-tag="campaign-result-patron-count"]::text').get(default=""))
             short_desc = artist.css('p.sc-jrQzAO.bsIqPC::text').get()
 
             # parse posts and patrons as int
-            posts = int(posts[:-5].strip().replace(',', ''))  # remove 'posts'
+            posts = int(self.stat_matcher.search(posts).group(1))
             if patrons:  # patrons number might be missing (private)
-                patrons = int(patrons[:-7].strip().replace(',', ''))  # remove 'patrons'
+                patrons = int(patrons.group(1))
 
             # follow the artist's page to get the long description, pricing, etc.
             yield scrapy.Request(url, callback=self.parse_artist, meta={
@@ -98,6 +87,21 @@ class PatreonSpider(scrapy.Spider):
                            , response.css('div[data-tag="reward-tier-card"]')))
         long_desc = response.css('div[data-tag="summary-container"] *::text').getall()
         long_desc = ' '.join(long_desc)
+
+        print(artist_dict.make(
+            self.name,
+            response.url,
+            response.meta['name'],
+            response.meta['image'],
+            response.meta['short_desc'],
+            long_desc,
+            response.meta['posts'],
+            response.meta['patrons'],
+            pricing,
+            "",
+            response.css('div[data-tag="campaign-social-links"] a[role="button"]::attr("href")').getall(),
+            ""#response.css('div[data-tag="cover-photo-container"]')
+        ))
 
         yield artist_dict.make(
             self.name,

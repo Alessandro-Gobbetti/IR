@@ -20,9 +20,9 @@ def make(site,  # Domain of scraped site
         'bio_long': bio_long,
         'amount_post': amount_post,
         'amount_subs': amount_subs,
-        'price_tiers': price_tiers,
-        'tags': tags,
-        'socialmedias': socialmedias
+        'price_tiers': price_tiers or [],
+        'tags': tags or [],
+        'socialmedias': socialmedias or []
     }
 
 
