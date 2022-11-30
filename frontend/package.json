@@ -35,6 +35,7 @@
     "vue-cookies": "^1.8.1",
     "vue-loop": "^0.2.6",
     "vue-router": "^4.0.13",
+    "vue-snip": "^2.0.0",
     "vue-svg-loader": "github:visualfanatic/vue-svg-loader",
     "vuetify": "^3.0.0-beta.0",
     "vuex": "^4.0.0",
