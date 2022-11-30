@@ -10,6 +10,20 @@ class PatreonSpider(scrapy.Spider):
 
     start_urls = [
         'https://www.patreon.com/search?q=art',
+        'https://www.patreon.com/search?q=music',
+        'https://www.patreon.com/search?q=photography',
+        'https://www.patreon.com/search?q=writing',
+        'https://www.patreon.com/search?q=game',
+        'https://www.patreon.com/search?q=technology',
+        'https://www.patreon.com/search?q=fitness',
+        'https://www.patreon.com/search?q=cooking',
+        'https://www.patreon.com/search?q=travel',
+        'https://www.patreon.com/search?q=education',
+        'https://www.patreon.com/search?q=health',
+        'https://www.patreon.com/search?q=politic',
+        'https://www.patreon.com/search?q=podcast',
+        'https://www.patreon.com/search?q=stream',
+        'https://www.patreon.com/search?q=video',
     ]
 
 
@@ -88,22 +102,9 @@ class PatreonSpider(scrapy.Spider):
         long_desc = response.css('div[data-tag="summary-container"] *::text').getall()
         long_desc = ' '.join(long_desc)
 
-        print(artist_dict.make(
-            self.name,
-            response.url,
-            response.meta['name'],
-            response.meta['image'],
-            response.meta['short_desc'],
-            long_desc,
-            response.meta['posts'],
-            response.meta['patrons'],
-            pricing,
-            "",
-            response.css('div[data-tag="campaign-social-links"] a[role="button"]::attr("href")').getall(),
-            ""#response.css('div[data-tag="cover-photo-container"]')
-        ))
 
-        yield artist_dict.make(
+
+        scraped = artist_dict.make(
             self.name,
             response.url,
             response.meta['name'],
@@ -117,6 +118,9 @@ class PatreonSpider(scrapy.Spider):
             response.css('div[data-tag="campaign-social-links"] a[role="button"]::attr("href")').getall(),
             ""#response.css('div[data-tag="cover-photo-container"]')
         )
+
+        # print(scraped)
+        yield scraped;
 
     async def errback(self, failure):
         page = failure.request.meta["playwright_page"]
