@@ -3,27 +3,27 @@
 
 
   <div class="artist_card_big">
-    <img class="banner" :src="artist_banner" alt="artist banner" />
+    <img class="banner" :src="artist.artist_banner" alt="artist banner" />
     <div class="artist">
-      <img class="pic" :src="artist_image" alt="artist image" />
+      <img class="pic" :src="artist.artist_image" alt="artist image" />
       <img class="site_logo" :src="getLogo()" alt=""/>
-      <h2 class="name">{{ artist_name }}</h2>
+      <h2 class="name">{{ artist.artist_name }}</h2>
       <p class="stats">
-        <span v-if="amount_subs">{{ amount_subs }} subs</span>
-        <span v-if="amount_subs && amount_post"> ・ </span>
-        <span v-if="amount_post">{{ amount_post }} posts</span>
+        <span v-if="artist.amount_subs">{{ artist.amount_subs }} subs</span>
+        <span v-if="artist.amount_subs && artist.amount_post"> ・ </span>
+        <span v-if="artist.amount_post">{{ artist.amount_post }} posts</span>
       </p>
       <div class="tags">
-        <div class="tag" v-for="tag in tags" :key="tag">
+        <div class="tag" v-for="tag in artist.tags" :key="tag">
           <!-- TODO: onclick search for the tag -->
           {{ tag }}
         </div>
       </div>
-      <p v-if="bio" class="bio">{{ bio }}</p>
-      <p v-if="bio_long" class="long_bio">{{bio_long}}</p>
-      <div v-if="price_tiers" class="tiers">
+      <p v-if="artist.bio" class="bio">{{ artist.bio }}</p>
+      <p v-if="artist.bio_long" class="long_bio">{{artist.bio_long}}</p>
+      <div v-if="artist.price_tiers" class="tiers">
         <h2 class="title">Price tiers</h2>
-        <div class="tier" v-for="tier in price_tiers" :key="tier">
+        <div class="tier" v-for="tier in artist.price_tiers" :key="tier">
           <div class="tier_price">{{ tier.monthly }}</div>
           <div class="tier_title">{{ tier.title }}</div>
           <div class="tier_desc">{{ tier.description }}</div>
@@ -31,7 +31,7 @@
       </div>
 
       <div class="social_media">
-        <a v-for="social in socialmedias" :key="social" :href="social" target="blank">
+        <a v-for="social in artist.socialmedias" :key="social" :href="social" target="blank">
           <v-icon class="social">{{getIconCode(social)}}</v-icon>
         </a>
       </div>
@@ -47,48 +47,14 @@ export default defineComponent({
   name: "ArtistCardBig",
 
   props: {
-    "site": {
-      type: String
-    },
-    "page_link": {
-      type: String
-    },
-    "artist_name": {
-      type: String
-    },
-    "artist_image": {
-      type: String
-    },
-    "artist_banner": {
-      type:String
-    },
-    "bio": {
-      type: String
-    },
-    "bio_long": {
-      type: String
-    },
-    "amount_post": {
-      type: Number
-    },
-    "amount_subs": {
-      type: Number
-    },
-    "price_tiers": {
-      type: Array,
-      default: []
-    },
-    "tags": {
-      type: Array
-    },
-    "socialmedias": {
-      type: Array
+    artist: {
+      type: Object,
     }
   },
 
   methods: {
     getLogo() {
-      switch (this.site) {
+      switch (this.artist.site) {
         case "ko-fi":
           return "src/assets/images/KoFi-Logo.png";
         case "patreon":

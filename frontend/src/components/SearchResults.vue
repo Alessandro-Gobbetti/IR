@@ -1,20 +1,6 @@
 <template>
 <!--  TODO: Merge ArtistCardBig and ArtistCard in one component. Use prop 'expanded' to make it bigger-->
-  <component v-for="(artist,idx) in results" :is="idx===0? 'ArtistCardBig' : 'ArtistCard'" :key="idx" v-bind="artist"  />
-<!--  <ArtistCardBig />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
-<!--  <ArtistCard />-->
+  <component v-for="(artist,idx) in results" :artist="artist" :is="idx===0? 'ArtistCardBig' : 'ArtistCard'" :key="idx"  />
 
 </template>
 

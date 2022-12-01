@@ -1,22 +1,22 @@
 <template>
-  <a class="artist_card" v-bind:href=page_link>
-    <img class="artist_image" :src="artist_image" alt="artist image" />
+  <a class="artist_card" v-bind:href=artist.page_link>
+    <img class="artist_image" :src="artist.artist_image" alt="artist image" />
     <img class="site_logo" :src="getLogo()" alt="" />
-    <h2 class="name" v-snip="{ lines: 1, mode: 'css'}">{{ artist_name }}</h2>
+    <h2 class="name" v-snip="{ lines: 1, mode: 'css'}">{{ artist.artist_name }}</h2>
     <p class="stats">
-      <span v-if="amount_subs">{{ amount_subs }} subs</span>
-      <span v-if="amount_subs && amount_post"> ・ </span>
-      <span v-if="amount_post">{{ amount_post }} posts</span>
+      <span v-if="artist.amount_subs">{{ amount_subs }} subs</span>
+      <span v-if="artist.amount_subs && amount_post"> ・ </span>
+      <span v-if="artist.amount_post">{{ artist.amount_post }} posts</span>
     </p>
     <div class="tags">
-      <div class="tag" v-for="tag in tags" :key="tag">
+      <div class="tag" v-for="tag in artist.tags" :key="tag">
         <!-- TODO: onclick search for the tag -->
         {{ tag }}
       </div>
     </div>
 
     <p v-snip="{ lines: 2, mode: 'js' }" class="bio">
-      {{ bio }}
+      {{ artist.bio }}
     </p>
   </a>
 </template>
@@ -29,49 +29,14 @@ export default defineComponent({
   name: "ArtistCard",
 
   props: {
-
-    "site": {
-      type: String
-    },
-    "page_link": {
-      type: String
-    },
-    "artist_name": {
-      type: String
-    },
-    "artist_image": {
-      type: String
-    },
-    "artist_banner": {
-      type:String
-    },
-    "bio": {
-      type: String
-    },
-    "bio_long": {
-      type: String
-    },
-    "amount_post": {
-      type: Number
-    },
-    "amount_subs": {
-      type: Number
-    },
-    "price_tiers": {
-      type: Array,
-      default: []
-    },
-    "tags": {
-      type: Array
-    },
-    "socialmedias": {
-      type: Array
+    artist: {
+      type: Object,
     }
   },
 
   methods: {
     getLogo() {
-      switch (this.site) {
+      switch (this.artist.site) {
         case "ko-fi":
           return "src/assets/images/KoFi-Logo.png";
         case "patreon":
