@@ -29,6 +29,12 @@
           <div class="tier_desc">{{ tier.description }}</div>
         </div>
       </div>
+
+      <div class="social_media">
+        <a v-for="social in artist.socialmedias" :key="social" :href="social">
+          <v-icon class="social">{{getIconCode(social)}}</v-icon>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -47,7 +53,7 @@ export default defineComponent({
   data: () => ({
     artist: 
     Math.random() < 0.3 ?
-    {"site": "patreon", "page_link": "https://www.patreon.com/geoffreysiu", "artist_name": "Geoffrey Siu Art", "artist_image": "https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4365400/0ef3ca7d793e4caca1a02299204a3c57/eyJ3IjoyMDB9/4.png?token-time=2145916800&token-hash=UxdUTHJ1goSnREDHvo5ygr1gwfS6frbREttdkruzCL8%3D", "artist_banner": "https://cdn.ko-fi.com/cdn/useruploads/png_62e6821c-5c4b-4902-83ea-81cca0aa3489cover.jpg?v=8341e32f-412f-4738-9f16-d3747eed0e8c", "bio": "fancy Pokemon pins every month", "bio_long": "Hello there! It's Geoffrey and I am an artist/designer in Honolulu, Hawaii. I design enamel pins, t-shirts, draw silly dad-humor comics, and love staying inside even when the weather is nice out. Expect exclusive Gentlemon pin designs, stickers, and a first look at new products before they hit the shelves! I love to draw cute things with a long history with video games and anime/manga. I got my first start making little charms and t-shirts at a local anime convention! I started doing it with a friend in high school. We had a good run, but school and stuff got in the way. A decade later, I am back at creating products and selling original artwork and have finally made this my full-time job! ", "amount_post": 107, "amount_subs": 351, "price_tiers": [{"title": "Supporter", "monthly": "$3", "description": "For those that simply fancy everything Gentlemon. In this tier, you will receive: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}, {"title": "Sticker Club - US/ INTL (No Tracking)", "monthly": "$6", "description": "Join this tier if you wanna treat yourself to something fancy. In this tier, you will receive the exclusive Gentlemon Sticker of the month. Every month, you will receive an all-new holographic glitter sticker design or a Patreon exclusive variant of a sticker. Gentlemon Sticker of the Month NO TRACKING # You will also have: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}, {"title": "Pin Club - US (+ Tracking)", "monthly": "$15", "description": "Join this tier if you enjoy the finer things in life. In this tier, you will receive the exclusive Gentlemon Pin of the month. Every month, you will receive an all-new pin design or a Patreon exclusive pin variant. Gentlemon Pin of the Month FREE tracking within the United States You will also have: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}], "tags": "", "socialmedias": ["https://www.instagram.com/itsgeoffrey"]}
+    {"site": "patreon", "page_link": "https://www.patreon.com/geoffreysiu", "artist_name": "Geoffrey Siu Art", "artist_image": "https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4365400/0ef3ca7d793e4caca1a02299204a3c57/eyJ3IjoyMDB9/4.png?token-time=2145916800&token-hash=UxdUTHJ1goSnREDHvo5ygr1gwfS6frbREttdkruzCL8%3D", "artist_banner": "https://cdn.ko-fi.com/cdn/useruploads/png_62e6821c-5c4b-4902-83ea-81cca0aa3489cover.jpg?v=8341e32f-412f-4738-9f16-d3747eed0e8c", "bio": "fancy Pokemon pins every month", "bio_long": "Hello there! It's Geoffrey and I am an artist/designer in Honolulu, Hawaii. I design enamel pins, t-shirts, draw silly dad-humor comics, and love staying inside even when the weather is nice out. Expect exclusive Gentlemon pin designs, stickers, and a first look at new products before they hit the shelves! I love to draw cute things with a long history with video games and anime/manga. I got my first start making little charms and t-shirts at a local anime convention! I started doing it with a friend in high school. We had a good run, but school and stuff got in the way. A decade later, I am back at creating products and selling original artwork and have finally made this my full-time job! ", "amount_post": 107, "amount_subs": 351, "price_tiers": [{"title": "Supporter", "monthly": "$3", "description": "For those that simply fancy everything Gentlemon. In this tier, you will receive: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}, {"title": "Sticker Club - US/ INTL (No Tracking)", "monthly": "$6", "description": "Join this tier if you wanna treat yourself to something fancy. In this tier, you will receive the exclusive Gentlemon Sticker of the month. Every month, you will receive an all-new holographic glitter sticker design or a Patreon exclusive variant of a sticker. Gentlemon Sticker of the Month NO TRACKING # You will also have: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}, {"title": "Pin Club - US (+ Tracking)", "monthly": "$15", "description": "Join this tier if you enjoy the finer things in life. In this tier, you will receive the exclusive Gentlemon Pin of the month. Every month, you will receive an all-new pin design or a Patreon exclusive pin variant. Gentlemon Pin of the Month FREE tracking within the United States You will also have: Access to blog posts, sneak peeks, and behind-the-scenes Ability to vote and nominate future Gentlemon designs for the next month!"}], "tags": "", "socialmedias": ["https://www.instagram.com/itsgeoffrey", "https://twitter.com/", "https://facebook.com/", "https://tumblr.com/", "https://google.com/"]}
     :
     Math.random() < 0.5 ?
     {"site": "subscribestar", "page_link": "https://www.subscribestar.com/mhv", "artist_name": "Military History Visualized", "artist_image": "https://d3ts7pb9ldoin4.cloudfront.net/uploads/users/8758/avatars/d96fdd26-4a48-4b75-a76a-191c74fc107e-380x380_39x39_384x384.png", "artist_banner": "https://d3ts7pb9ldoin4.cloudfront.net/uploads/users/8758/covers/c2502e0e-5ceb-43e4-9815-3cfabb8f1d2c-1240x0_0x2_1599x300.png", "bio": "YouTube Channel on Military History", "bio_long": null, "amount_post": "831", "amount_subs": "", "price_tiers": [{"title": "Gefreiter / Corporal", "monthly": "$1", "description": "Weekly updates - on upcoming videos, events and other behind the scenes information. "}, {"title": "Feldwebel / Sergeant", "monthly": "$3", "description": "Early Access - Get Early Access to my videos."}, {"title": "Leutnant / Lieutenant", "monthly": "$7", "description": "Monthly Livestream - Once a month there is live-stream just for the members of this tier and above. The recorded version will also be exclusive to you."}, {"title": "Hauptmann / Captain", "monthly": "$15", "description": "Discord Server Access - Chat with like-minded individuals.   Exclusive Discord server access (includes Military Aviation History and Justin). "}, {"title": "Oberst", "monthly": "$30", "description": "WW2 Question - Submit one Content Question about WW2 to the Monthly Oberst Q & A. Note that the question must be feasible, don't worry so far we also adapted it successfully. The question will be answered at least audio-only for all Obersts, yet might also turn into a full video. Non-WW2 question might be possible, if my library covers it. Note regular content guidelines: NO war crimes, NO atrocities & NO political units."}], "tags": ["MilitaryHistory", "History", "Education", "YouTube", "Military"], "socialmedias": []}
@@ -69,6 +75,35 @@ export default defineComponent({
           return "";
       }
     },
+
+    getIconCode(social){
+      // parse url to get website name
+      let url = new URL(social);
+      let host = url.hostname.replace("www.", "");
+      host = host.split(".")[0];
+
+      console.log(host);
+
+      let supported_websites = [
+        'facebook', 
+        'google', 
+        'instagram', 
+        'linkedin', 
+        'pinterest', 
+        'reddit', 
+        'snapchat', 
+        'twitter', 
+        'vimeo', 
+        'youtube',
+        'twitch',
+      ];
+
+      if (supported_websites.includes(host)){
+        return `mdi-${host}`;
+      } else {
+        return 'mdi-web';
+      }
+    }
   },
 });
 </script>
@@ -222,6 +257,28 @@ export default defineComponent({
   align-self: start;
 }
 
+.artist_card_big .social_media {
+  grid-area: socials;
+  font-size: 0.8rem;
+  justify-self: end;
+  margin-right: -2vw;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
+.artist_card_big .social_media a {
+  text-decoration: none;
+  color: black;
+  transition: transform 0.2s;
+  background-color: rgb(232, 232, 232);
+  border-radius: 100%;
+  margin-left: 0.5vw;
+  padding: 0.2rem;
+}
+
+.artist_card_big .social_media a:hover {
+  transform: translateY(-0.2rem);
+}
 
 </style>
