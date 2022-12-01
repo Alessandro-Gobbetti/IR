@@ -58,14 +58,14 @@ export default defineComponent({
       type: Number
     },
     "price_tiers": {
-      type: [Object],
+      type: Array,
       default: []
     },
     "tags": {
-      type: [String]
+      type: Array
     },
     "socialmedias": {
-      type: [String]
+      type: Array
     }
   },
 

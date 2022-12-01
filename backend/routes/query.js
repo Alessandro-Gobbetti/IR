@@ -16,7 +16,7 @@ router.get('/*', function(req, res) {
 
 
     let params = {
-        ...req.params,
+        ...req.query,
         indent: true,
         "q.op" : "OR"
     }
