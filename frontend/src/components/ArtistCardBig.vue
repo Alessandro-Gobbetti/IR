@@ -29,6 +29,12 @@
           <div class="tier_desc">{{ tier.description }}</div>
         </div>
       </div>
+
+      <div class="social_media">
+        <a v-for="social in socialmedias" :key="social" :href="social" target="blank">
+          <v-icon class="social">{{getIconCode(social)}}</v-icon>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -93,6 +99,35 @@ export default defineComponent({
           return "";
       }
     },
+
+    getIconCode(social){
+      // parse url to get website name
+      let url = new URL(social);
+      let host = url.hostname.replace("www.", "");
+      host = host.split(".")[0];
+
+      console.log(host);
+
+      let supported_websites = [
+        'facebook',
+        'google',
+        'instagram',
+        'linkedin',
+        'pinterest',
+        'reddit',
+        'snapchat',
+        'twitter',
+        'vimeo',
+        'youtube',
+        'twitch',
+      ];
+
+      if (supported_websites.includes(host)){
+        return `mdi-${host}`;
+      } else {
+        return 'mdi-web';
+      }
+    }
   },
 });
 </script>
@@ -246,6 +281,29 @@ export default defineComponent({
   align-self: start;
 }
 
+.artist_card_big .social_media {
+  grid-area: socials;
+  font-size: 0.8rem;
+  justify-self: end;
+  margin-right: -2vw;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
+.artist_card_big .social_media a {
+  text-decoration: none;
+  color: black;
+  transition: transform 0.2s;
+  background-color: rgb(232, 232, 232);
+  border-radius: 100%;
+  margin-left: 0.5vw;
+  padding: 0.2rem;
+}
+
+.artist_card_big .social_media a:hover {
+  cursor: pointer;
+  transform: translateY(-0.2rem);
+}
 
 </style>
