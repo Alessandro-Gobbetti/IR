@@ -4,6 +4,8 @@
     type="text"
     class="form-control"
     placeholder="Search"
+    :onchange="this.onchange"
+    :oninput="this.oninputchange"
   />
 </template>
 
@@ -13,6 +15,18 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "SearchBar",
+  props: {
+    // When the input value changes (eg any key press)
+    oninputchange: {
+      type: Function,
+      default: (e)=>{}
+    },
+    // When the inout is confirmed (eg 'Enter' key)
+    onchange: {
+      type: Function,
+      default: (e)=>{}
+    }
+  },
 
   components: {
     // HelloWorld,

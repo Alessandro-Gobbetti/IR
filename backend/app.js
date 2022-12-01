@@ -1,5 +1,7 @@
 // require framework and middleware dependencies
 const express = require('express');
+var cors = require('cors')
+
 const logger = require('morgan');
 const methodOverride = require('method-override')
 
@@ -23,13 +25,14 @@ app.use(methodOverride('_method'));
 
 app.set('trust proxy', 1)
 
+app.use(cors(webserver.corsOptions))
 
 /////////////////////////////////////////////////////////////////////////////////////
 // CONTROLLERS
 //this will automatically load all routers found in the routes folder
 const routers = require('./routes');
 
-app.use('/', routers.root);
+app.use('/query', routers.query);
 
 // Static folders
 app.use('/', express.static('public'));

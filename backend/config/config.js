@@ -17,6 +17,11 @@ const settings = {
         domain: HOST,
         port: PORT,
 
+        corsOptions: {
+            origin: '*',
+            optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+        },
+
         rate : {
             generic_limiter:
              rate_limit({
