@@ -31,6 +31,7 @@ export default defineComponent({
   props: {
     artist: {
       type: Object,
+      default: {"site": "subscribestar", "page_link": "https://www.subscribestar.com/LukeAbsolumReid", "artist_name": "Luke Absolum Reid ", "artist_image": "https://d3ts7pb9ldoin4.cloudfront.net/uploads/users/203278/avatars/c4eba439-10d0-4816-a08b-7293a4cfef68-380x380_48x149_429x429.jpg", "artist_banner": "https://d3ts7pb9ldoin4.cloudfront.net/uploads/users/203278/covers/47ce6685-ccc4-4bf9-91e2-daa2a806e955-1240x0_0x2500_3599x675.jpg", "bio": "I am an artist and a dungeon master that enjoys bringing fantasy worlds to life through illustration. ", "bio_long": null, "amount_post": "21", "amount_subs": "", "price_tiers": [], "tags": ["Illustration", "Cartography", "Art", "DungeonsAndDragons", "Ttrpg", "Map"], "socialmedias": []},
     }
   },
 
