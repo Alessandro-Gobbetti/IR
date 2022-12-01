@@ -100,8 +100,8 @@ export default defineComponent({
   width: 75%;
   margin-left: 10%;
   border-radius: 2vh;
-  padding: 10px 10px;
-  grid-column-gap: 10px;
+  padding: 1vh;
+  grid-column-gap: 1vw;
   transition: box-shadow 0.5s;
   text-decoration: none;
   color: black;
@@ -127,7 +127,7 @@ export default defineComponent({
   align-self: baseline;
   margin: 1vh;
   /* fully tranparent img*/
-  opacity: 1;
+  opacity: 0;
   transition: opacity 0.5s;
 }
 
@@ -156,8 +156,6 @@ export default defineComponent({
   padding: 0;
   font-size: 0.8rem;
 }
-
-
 
 .artist_card .tag {
   margin: 0 5px 5px 0;

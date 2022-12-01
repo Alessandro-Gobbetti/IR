@@ -31,7 +31,7 @@
       </div>
 
       <div class="social_media">
-        <a v-for="social in artist.socialmedias" :key="social" :href="social">
+        <a v-for="social in artist.socialmedias" :key="social" :href="social" target="blank">
           <v-icon class="social">{{getIconCode(social)}}</v-icon>
         </a>
       </div>
@@ -278,6 +278,7 @@ export default defineComponent({
 }
 
 .artist_card_big .social_media a:hover {
+  cursor: pointer;
   transform: translateY(-0.2rem);
 }
 
