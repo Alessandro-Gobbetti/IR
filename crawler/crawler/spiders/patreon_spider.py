@@ -57,6 +57,7 @@ class PatreonSpider(scrapy.Spider):
 
         # parse url to guess category
         tag = response.url.split('search?q=')[1]
+        tag = tag.split('&')[0]
         tags = [tag]
 
         for artist in response.css('div[data-tag="campaign-result"]'):
