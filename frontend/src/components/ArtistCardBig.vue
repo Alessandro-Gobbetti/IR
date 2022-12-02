@@ -53,7 +53,7 @@ export default defineComponent({
     },
     expanded: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     show_tiers: {
       type: Boolean,

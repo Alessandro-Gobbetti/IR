@@ -10,15 +10,11 @@ const solr = require("../modules/solr")
 
 router.get('/*', function(req, res) {
     // Create query
-    // var query = ;
-    // var query = solr.query().q(req.url)
-    //
-
-
     let params = {
         ...req.query,
         indent: true,
-        "q.op" : "OR"
+        "q.op" : "OR",
+        "df" : 'all'
     }
 
     // Search documents using objQuery

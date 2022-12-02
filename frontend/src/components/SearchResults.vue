@@ -1,7 +1,8 @@
 <template>
 <!--  TODO: call ArtistCardBig with props-->
   <div>
-    <component v-for="(artist,idx) in results" :artist="artist" :is="idx===0? 'ArtistCardBig' : 'ArtistCard'" :key="idx"  />
+    <ArtistCardBig v-for="(artist,idx) in results" :artist="artist" :expanded="idx===0" :key="artist.id"  />
+
   </div>
 </template>
 

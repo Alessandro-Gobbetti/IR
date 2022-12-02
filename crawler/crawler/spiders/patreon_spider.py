@@ -55,6 +55,10 @@ class PatreonSpider(scrapy.Spider):
 
         print('\033[92m' + "Parsing: " + response.url + '\033[0m')
 
+        # parse url to guess category
+        tag = response.url.split('search?q=')[1]
+        tags = [tag]
+
         for artist in response.css('div[data-tag="campaign-result"]'):
             name = artist.css('span::text').get()
             url = artist.css('a::attr(href)').get()
@@ -62,6 +66,7 @@ class PatreonSpider(scrapy.Spider):
             posts = artist.css('p.sc-jrQzAO.DzYUV::text').get()
             patrons = self.stat_matcher.search(artist.css('p[data-tag="campaign-result-patron-count"]::text').get(default=""))
             short_desc = artist.css('p.sc-jrQzAO.bsIqPC::text').get()
+
 
             # parse posts and patrons as int
             posts = int(self.stat_matcher.search(posts).group(1))
@@ -75,6 +80,7 @@ class PatreonSpider(scrapy.Spider):
                 'posts': posts,
                 'patrons': patrons,
                 'short_desc': short_desc,
+                'tags': tags,
             })
 
         # the next page is the first link after the current page
@@ -114,7 +120,7 @@ class PatreonSpider(scrapy.Spider):
             response.meta['posts'],
             response.meta['patrons'],
             pricing,
-            "",
+            response.meta['tags'],
             response.css('div[data-tag="campaign-social-links"] a[role="button"]::attr("href")').getall(),
             ""#response.css('div[data-tag="cover-photo-container"]')
         )
