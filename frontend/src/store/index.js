@@ -7,7 +7,10 @@ export default createStore({
   getters: {
     getResults: () => async (query) => {
       const url = import.meta.env.VITE_BACKEND_URL
-      return await (await fetch(`${url}/query?${query}`)).json()
+      console.log(`++ FETCH ++\n'${url}/query?${query}'`)
+      let results = await (await fetch(`${url}/query?${query}`)).json()
+      console.log(results)
+      return results;
     }
   },
   mutations: {

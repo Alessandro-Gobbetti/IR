@@ -35,7 +35,7 @@ export default defineComponent({
     'initialValue': {
       handler() {
         // Does not do anything if it's the same value and has already fetched it.
-        if (this.initialValue == this.value && this.last_query)
+        if (this.initialValue == this.value && this.last_query !== null)
           return
         this.value = this.initialValue;
         if(this.fetchInitialValue)
@@ -54,8 +54,7 @@ export default defineComponent({
     },
     // Async runs a query and returns the results.
     async fetchResults(query) {
-      console.log(`++ fetching query '${query}'++`)
-      this.last_query = this.value
+      this.last_query = query
       return await store.getters.getResults(query)
     }
   },
