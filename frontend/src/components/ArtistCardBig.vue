@@ -18,12 +18,12 @@
       </div>
       <p v-if="artist.bio" class="bio" v-snip="{ lines: expanded ? -1 : 1, mode: 'css' }">{{ artist.bio }}</p>
       <p v-if="expanded && artist.bio_long" class="long_bio">{{artist.bio_long}}</p>
-      <div v-if="(show_tiers && expanded && artist.price_tiers && artist.price_tiers.length > 0)" class="tiers">
+      <div v-if="(show_tiers && expanded && artist.price_tiers_monthly.length > 0)" class="tiers">
         <h2 class="title">Price tiers</h2>
-        <div class="tier" v-for="tier in artist.price_tiers" :key="tier">
-          <div class="tier_price">{{ tier.monthly }}</div>
-          <div class="tier_title">{{ tier.title }}</div>
-          <div class="tier_desc">{{ tier.description }}</div>
+        <div class="tier" v-for="idx in artist.price_tiers_monthly.length" :key="tier">
+          <div class="tier_price">{{ artist.price_tiers_monthly[idx-1] }}</div>
+          <div class="tier_title">{{ artist.price_tiers_title[idx-1] }}</div>
+          <div class="tier_desc">{{ artist.price_tiers_description[idx-1] }}</div>
         </div>
       </div>
 

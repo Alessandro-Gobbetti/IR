@@ -36,7 +36,7 @@ router.get('/*', function(req, res) {
             "df" : "all",
             "indent" : true
         },
-        fields: "*"
+        fields: "*,score"
     }
 
     // Search documents using objQuery
