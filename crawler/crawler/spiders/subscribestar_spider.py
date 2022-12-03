@@ -46,6 +46,8 @@ class SubscribeStarSpider(scrapy.Spider):
            yield scrapy.Request(url=response.urljoin(next_page), callback=self.parse)
 
     async def parse_artist(self, response):
+        print('\033[90m' + "\tParsing: " + response.url + '\033[0m')
+
         subscribers = self.stat_matcher.search(response.css('.subscribers_count:last-child::text').get(default=""))
         subscribers = "" if subscribers is None else subscribers.group(1)
 
