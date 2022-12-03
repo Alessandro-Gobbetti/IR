@@ -7,9 +7,12 @@ class KoFiSpider(scrapy.Spider):
     name = 'ko-fi'
 
     # By default, crawls many tags. Array is passed as a string delimited by comma.
-    def __init__(self, tagsArg=None,artistsArg=None, **kwargs):
-        if tagsArg:
-            tags = tagsArg.split(',')
+    def __init__(self, tags=None, artists=None, searches=None, **kwargs):
+
+        if tags == 'null':
+            tags = []
+        elif tags:
+            tags = tags.split(',')
         else:
             tags = ['Advice', 'Animation', 'Art', 'Blogging',
                     'Comedy', 'Comics', 'Commissions', 'Community',
@@ -22,8 +25,12 @@ class KoFiSpider(scrapy.Spider):
                     'Streaming', 'Video and Film', 'Writing']
         # create an url for each tag
         self.start_urls = [f'https://ko-fi.com/explore?category={tag}' for tag in tags ]
-        super().__init__(**kwargs)
 
+        self.artists_urls = []
+        if artists:
+            self.artists_urls = artists.split(',')
+
+        super().__init__(**kwargs)
 
 
     custom_settings = {
@@ -39,13 +46,19 @@ class KoFiSpider(scrapy.Spider):
     def start_requests(self):
         """Start the requests with playwright, so we can wait for the page to load."""
         for url in self.start_urls:
-            yield scrapy.Request(url, meta={
+            yield scrapy.Request(url, 
+                callback=self.parse,
+                meta={
                 'playwright': True,
                 'playwright_include_page': True,
-                # 'playwright_page_methods': [
-                #     PageMethod('wait_for_selector',
-                #                'div[data-tag="campaign-result"]')
-                # ],
+                'errback': self.errback,
+            })
+        for url in self.artists_urls:
+            yield scrapy.Request(url, 
+                callback=self.parse_artist,
+                meta={
+                'playwright': True,
+                'playwright_include_page': True,
                 'errback': self.errback,
             })
 
