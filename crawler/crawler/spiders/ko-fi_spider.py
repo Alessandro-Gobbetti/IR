@@ -6,19 +6,25 @@ import artist_dict
 class KoFiSpider(scrapy.Spider):
     name = 'ko-fi'
 
-    kofitags = ['Advice', 'Animation', 'Art', 'Blogging',
-                'Comedy', 'Comics', 'Commissions', 'Community', 
-                'Cosplay', 'Crafts', 'Dance & Theatre', 'Design', 
-                'Drawing & Painting', 'Education', 'Food & Drink', 
-                'Fundraising', 'Game Development', 'Gaming', 
-                'Health & Fitness', 'Lifestyle', 'Money', 'Music', 
-                'News', 'Nsfw', 'Other', 'Photography', 'Podcast', 
-                'Science & Tech', 'Social', 'Software', 'Spirituality', 
-                'Streaming', 'Video and Film', 'Writing']
+    # By default, crawls many tags. Array is passed as a string delimited by comma.
+    def __init__(self, tagsArg=None,artistsArg=None, **kwargs):
+        if tagsArg:
+            tags = tagsArg.split(',')
+        else:
+            tags = ['Advice', 'Animation', 'Art', 'Blogging',
+                    'Comedy', 'Comics', 'Commissions', 'Community',
+                    'Cosplay', 'Crafts', 'Dance & Theatre', 'Design',
+                    'Drawing & Painting', 'Education', 'Food & Drink',
+                    'Fundraising', 'Game Development', 'Gaming',
+                    'Health & Fitness', 'Lifestyle', 'Money', 'Music',
+                    'News', 'Nsfw', 'Other', 'Photography', 'Podcast',
+                    'Science & Tech', 'Social', 'Software', 'Spirituality',
+                    'Streaming', 'Video and Film', 'Writing']
+        # create an url for each tag
+        self.start_urls = [f'https://ko-fi.com/explore?category={tag}' for tag in tags ]
+        super().__init__(**kwargs)
 
 
-    # create an url for each tag
-    start_urls = [f'https://ko-fi.com/explore?category={tag}' for tag in kofitags ]
 
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
