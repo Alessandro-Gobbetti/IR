@@ -4,7 +4,7 @@
       class="form-control"
       placeholder="Search"
       :value="value"
-      :onchange="(e)=>{
+      @keyup.enter="(e)=>{
         this.value = e.target.value
         this.onchange(this.value)
         performQuery();
