@@ -5,7 +5,13 @@ const routes = [
     path: '/',
     name: 'home',
     meta: { title: 'Homepage' },
-    component: () => import(/* webpackChunkName: "home" */ '@/views/HomeView.vue')
+    component: () => import(/* webpackChunkName: "home" */ '@/views/Homepage.vue')
+  },
+  {
+    path: '/search',
+    name: 'search',
+    meta: { title: 'Search results' },
+    component: () => import(/* webpackChunkName: "search" */ '@/views/ResultsPage.vue')
   }
 ]
 
