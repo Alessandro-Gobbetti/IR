@@ -6,6 +6,16 @@ import artist_dict
 class KoFiSpider(scrapy.Spider):
     name = 'ko-fi'
 
+    custom_settings = {
+        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+        "DOWNLOAD_HANDLERS": {
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        },
+        "DOWNLOAD_DELAY": 3,
+        "LOG_LEVEL": "INFO",
+    }
+    
     # By default, crawls many tags. Array is passed as a string delimited by comma.
     def __init__(self, tags=None, artists=None, searches=None, **kwargs):
 
@@ -32,16 +42,6 @@ class KoFiSpider(scrapy.Spider):
 
         super().__init__(**kwargs)
 
-
-    custom_settings = {
-        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
-        "DOWNLOAD_HANDLERS": {
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        },
-        "DOWNLOAD_DELAY": 2,
-        "LOG_LEVEL": "INFO",
-    }
 
     def start_requests(self):
         """Start the requests with playwright, so we can wait for the page to load."""

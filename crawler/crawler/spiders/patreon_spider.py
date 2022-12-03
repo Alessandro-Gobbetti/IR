@@ -8,6 +8,15 @@ class PatreonSpider(scrapy.Spider):
     name = 'patreon'
     stat_matcher = re.compile(r'^(\d+)')
 
+    custom_settings = {
+        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+        "DOWNLOAD_HANDLERS": {
+            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+        },
+        "LOG_LEVEL": "INFO",
+    }
+
     def __init__(self, tags=None, artists=None, searches=None, **kwargs):
         self.default_tags = ['Advice', 'Animation', 'Art', 'Blogging', 
                             'Comedy', 'Comics', 'Commissions', 'Community', 
@@ -44,14 +53,7 @@ class PatreonSpider(scrapy.Spider):
 
         super().__init__(**kwargs)
 
-    custom_settings = {
-        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
-        "DOWNLOAD_HANDLERS": {
-            "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-            "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
-        },
-        "LOG_LEVEL": "INFO",
-    }
+    
 
     def start_requests(self):
         """Start the requests with playwright, so we can wait for the page to load."""
@@ -129,8 +131,9 @@ class PatreonSpider(scrapy.Spider):
         subs = response.meta.get('patrons')
         if subs is None:
             subs = response.css('.sc-kfPuZi.hJYemi::text').get()
-            subs = subs.replace(',', '')
-            subs = int(subs.replace(',', '')) if subs.isdigit() else None
+            if subs:
+                subs = subs.replace(',', '')
+                subs = int(subs) if subs.isdigit() else None
 
         short_desc = response.css('div.sc-jrQzAO.bsIqPC::text').get()
 
