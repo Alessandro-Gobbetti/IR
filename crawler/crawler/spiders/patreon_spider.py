@@ -9,8 +9,15 @@ class PatreonSpider(scrapy.Spider):
     stat_matcher = re.compile(r'^(\d+)')
 
     def __init__(self, tags=None, artists=None, searches=None, **kwargs):
-        self.default_tags = ['art', 'music', 'photography', 'writing', 'game', 'technology', 'fitness',
-                    'cooking', 'travel', 'education', 'health', 'politic', 'podcast', 'stream', 'video']
+        self.default_tags = ['Advice', 'Animation', 'Art', 'Blogging', 
+                            'Comedy', 'Comics', 'Commissions', 'Community', 
+                            'Cooking', 'Cosplay', 'Crafts', 'Dance', 'Theatre', 
+                            'Design', 'Drawing', 'Painting', 'Education', 'Food', 
+                            'Drink', 'Fashion', 'Fundraising', 'Game Development',
+                            'Gaming', 'Health', 'Journalism', 'Fitness', 'Lifestyle', 
+                            'Money', 'Music', 'News', 'Nsfw', 'Other', 'Photography', 
+                            'Podcast', 'Politics', 'Science', 'Tech', 'Social', 'Software', 
+                            'Spirituality', 'Streaming', 'Video', 'Film', 'Writing']
 
         if tags == 'null':
             tags = []
@@ -29,14 +36,13 @@ class PatreonSpider(scrapy.Spider):
                 tags.append(query)
 
         # create an url for each tag
-        self.start_urls = [f'https://www.patreon.com/search?={tag}' for tag in tags ]
+        self.start_urls = [f'https://www.patreon.com/search?={tag}' for tag in tags]
 
         self.artists_urls = []
         if artists:
             self.artists_urls = artists.split(',')
 
         super().__init__(**kwargs)
-
 
     custom_settings = {
         "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
@@ -54,7 +60,8 @@ class PatreonSpider(scrapy.Spider):
                 'playwright': True,
                 'playwright_include_page': True,
                 'playwright_page_methods': [
-                    PageMethod('wait_for_selector', 'div[data-tag="campaign-result"]')
+                    PageMethod('wait_for_selector',
+                               'div[data-tag="campaign-result"]')
                 ],
                 'errback': self.errback,
             })
@@ -75,8 +82,6 @@ class PatreonSpider(scrapy.Spider):
         tags = []
         if tag in self.default_tags:
             tags.append(tag)
-
-            
 
         for artist in response.css('div[data-tag="campaign-result"]'):
             url = artist.css('a::attr(href)').get()
@@ -103,7 +108,8 @@ class PatreonSpider(scrapy.Spider):
                 'playwright': True,
                 'playwright_include_page': True,
                 'playwright_page_methods': [
-                    PageMethod('wait_for_selector', 'div[data-tag="campaign-result"]')
+                    PageMethod('wait_for_selector',
+                               'div[data-tag="campaign-result"]')
                 ],
                 'errback': self.errback,
             })
@@ -114,7 +120,7 @@ class PatreonSpider(scrapy.Spider):
 
         name = response.css('h1#pageheader-title::text').get()
         image = response.css('div#avatar-image::attr(src)').get()
-        
+
         posts = response.meta.get('posts')
         if posts is None:
             posts = response.css('div[color="brand"]::text').get()
@@ -141,7 +147,6 @@ class PatreonSpider(scrapy.Spider):
         # we know that the background image is the last one in the css
         banner = re.findall('background-image:url\(([^)]+)\)', response.text)[-1]
 
-
         yield artist_dict.make(
             site = self.name,
             page_link = response.url,
@@ -156,7 +161,6 @@ class PatreonSpider(scrapy.Spider):
             socialmedias = socialmedias,
             artist_banner = banner,
         )
-
 
     async def errback(self, failure):
         page = failure.request.meta["playwright_page"]
