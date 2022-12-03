@@ -15,7 +15,7 @@ class PatreonSpider(scrapy.Spider):
                             'Design', 'Drawing', 'Painting', 'Education', 'Food', 
                             'Drink', 'Fashion', 'Fundraising', 'Game Development',
                             'Gaming', 'Health', 'Journalism', 'Fitness', 'Lifestyle', 
-                            'Money', 'Music', 'News', 'Nsfw', 'Other', 'Photography', 
+                            'Money', 'Music', 'News', 'Nsfw', 'Photography', 
                             'Podcast', 'Politics', 'Science', 'Tech', 'Social', 'Software', 
                             'Spirituality', 'Streaming', 'Video', 'Film', 'Writing']
 
@@ -36,7 +36,7 @@ class PatreonSpider(scrapy.Spider):
                 tags.append(query)
 
         # create an url for each tag
-        self.start_urls = [f'https://www.patreon.com/search?={tag}' for tag in tags]
+        self.start_urls = [f'https://www.patreon.com/search?q={tag}' for tag in tags]
 
         self.artists_urls = []
         if artists:
@@ -129,7 +129,8 @@ class PatreonSpider(scrapy.Spider):
         subs = response.meta.get('patrons')
         if subs is None:
             subs = response.css('.sc-kfPuZi.hJYemi::text').get()
-            subs = int(subs.replace(',', '')) if subs else None
+            subs = subs.replace(',', '')
+            subs = int(subs.replace(',', '')) if subs.isdigit() else None
 
         short_desc = response.css('div.sc-jrQzAO.bsIqPC::text').get()
 
@@ -145,7 +146,8 @@ class PatreonSpider(scrapy.Spider):
 
         # the background image is in the embedded css, every time it is in a class with a different name
         # we know that the background image is the last one in the css
-        banner = re.findall('background-image:url\(([^)]+)\)', response.text)[-1]
+        banner = re.findall('background-image:url\(([^)]+)\)', response.text)
+        banner = banner[-1] if len(banner) > 0 else None
 
         yield artist_dict.make(
             site = self.name,
