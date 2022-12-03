@@ -53,9 +53,9 @@ ROBOTSTXT_OBEY = True
 #DOWNLOADER_MIDDLEWARES = {
 #    'crawler.middlewares.CrawlerDownloaderMiddleware': 543,
 #}
-# DOWNLOADER_MIDDLEWARES = {
-# 'scraping_hub.middlewares.CloudFlareMiddleware': 560
-# }
+
+RETRY_TIMES = 5
+RETRY_HTTP_CODES = [500, 502, 503, 504, 400, 403, 404, 408]
 
 
 DOWNLOADER_MIDDLEWARES = {
