@@ -7,13 +7,32 @@ class SubscribeStarSpider(scrapy.Spider):
     name = 'subscribestar'
     stat_matcher = re.compile(r'^(\d+)')
 
-    start_urls = [
-        'https://www.subscribestar.com/stars?_page=true&page=1',
-    ]
-
     custom_settings = {
         "LOG_LEVEL": "INFO",
     }
+
+    def __init__(self, tags=None, artists=None, searches=None, **kwargs):
+        '''Initialize the spider if a list of artists is provided then only scrape those artists, else scrape all the website'''
+        self.start_urls = []
+        self.artists_urls = []
+        if artists:
+            self.artists_urls = artists.split(',')
+        else:
+            self.start_urls = [
+                'https://www.subscribestar.com/stars?_page=true&page=1',
+            ]
+
+        super().__init__(**kwargs)
+
+
+    def start_requests(self):
+        """Start the requests"""
+        for url in self.start_urls:
+            yield scrapy.Request(url, callback=self.parse)
+
+        for url in self.artists_urls:
+            yield scrapy.Request(url, callback=self.parse_artist)
+
 
     async def parse(self, response):
         """Parse the search results page to get the artist's name, short description, image, etc."""
@@ -38,7 +57,6 @@ class SubscribeStarSpider(scrapy.Spider):
                                                      tier.css('.tiers-settings_item-title::text').get(),
                                                      tier.css('.tiers-settings_item-description p::text').get())
             ,response.css('div.tiers .tier-body')))
-        # print(tiers)
 
         yield artist_dict.make(
             self.name,
