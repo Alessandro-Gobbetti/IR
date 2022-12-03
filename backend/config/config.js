@@ -1,7 +1,7 @@
-/** 
- * 
+/**
+ *
  * Contains all the application settings and/or parameters.
- * 
+ *
 */
 
 const rate_limit = require("express-rate-limit");
@@ -30,6 +30,23 @@ const settings = {
                 message: "This IP is sending too many requests, slow down."
             })
         }
+    },
+    solr: {
+        host: '127.0.0.1',
+        port: '8983',
+        core: 'creators',
+        protocol: 'http'
+    },
+    scrapy: {
+        scrapy_folder_path: "",
+        // Relative path from scrapy folder to the folder where the scraped data is placed
+        scrapy_json_output_dir: "",
+        python_venv: "",
+
+        // How often to check for sites to be rescraped
+        scrape_check_ms: 1000*60*60*24, // every day
+        // If scraped documents/links are older than X days, they're up for being rescraped.
+        scrape_expiry_time: 0
     }
 }
 

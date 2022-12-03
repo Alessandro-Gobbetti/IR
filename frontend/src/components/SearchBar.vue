@@ -55,7 +55,8 @@ export default defineComponent({
     // Async runs a query and returns the results.
     async fetchResults(query) {
       this.last_query = query
-      return await store.getters.getResults(query)
+      // TODO: Once there are complex queries (filters ecc). Parse it into string form here
+      return await store.getters.getResults(`q=${query}`)
     }
   },
   props: {
