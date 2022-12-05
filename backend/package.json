@@ -4,6 +4,7 @@
   "main": "server.js",
   "private": true,
   "scripts": {
+    "solr-init": "node devscripts/solrinit.js",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
