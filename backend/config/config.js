@@ -42,19 +42,23 @@ const settings = {
         query: {
             term_weights: {
 
-            }
+            },
+            // How many results to retrieve with each search query by default.
+            page_size: 10
         }
     },
     scrapy: {
+        DISABLE_SCRAPING: false,
+
         scrapy_folder_path: path.join(__dirname, "../../crawler/crawler"),
         // Abs path of folder where the scraped data is stored
         scrapy_json_output_dir: path.join(__dirname,"../../crawler/crawler/crawled"),
         python_venv: path.join(__dirname,"../../crawler/scrapyenv"),
 
-        // How often to check for sites to be rescraped
-        scrape_check_ms: 1000*60*60*24, // every day
+        // How much to wait after scraping before starting another scrape.
+        scrape_check_ms: 1000*60*60*24, // 24h
         // If scraped documents/links are older than X days, they're up for being rescraped.
-        scrape_expiry_time: 0
+        scrape_expiry_time: 1
     }
 }
 
@@ -66,4 +70,5 @@ const deepFreeze = obj => {
     return Object.freeze(obj);
 };
 
-module.exports = deepFreeze(settings)
+// module.exports = deepFreeze(settings)
+module.exports = settings

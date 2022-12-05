@@ -3,7 +3,6 @@ from scrapy_playwright.page import PageMethod
 import re
 import artist_dict
 
-
 class PatreonSpider(scrapy.Spider):
     name = 'patreon'
     stat_matcher = re.compile(r'^(\d+)')
@@ -32,10 +31,6 @@ class PatreonSpider(scrapy.Spider):
             tags = []
         elif tags:
             tags = tags.split(',')
-            # update the tags list with the new tags
-            for tag in tags:
-                if tag not in self.default_tags:
-                    self.default_tags.append(tag)
         else:
             tags = self.default_tags
 

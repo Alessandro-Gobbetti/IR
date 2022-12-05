@@ -2,10 +2,12 @@ const {solr, scrapy} = require('../config/config.js')
 
 /**
  * Runs a Solr query with '/select' as the method handler.
+ * By default, the limit is set from the config value.
  * @param JSONquery the Solr JSON query object.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runSearchQuery(JSONquery) {
+    JSONquery.limit = JSONquery.limit | solr.query.page_size
     return runQuery("select", JSONquery)
 }
 
@@ -35,7 +37,6 @@ function runDeleteQuery(JSONquery) {
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runQuery(method_handler, JSONquery) {
-    // TODO: Add term weight
     return new Promise((resolve, reject) => {
         // console.log(`${solr.protocol}://${solr.host}:${solr.port}/solr/${solr.core}/${method_handler}? -d '${JSON.stringify(params)}'`)
         const url = `${solr.connection.protocol}://${solr.connection.host}:${solr.connection.port}/solr/${solr.connection.core}/${method_handler}?commit=true`
@@ -61,17 +62,35 @@ function runQuery(method_handler, JSONquery) {
 
 // HELPER METHODS
 
-async function getLeastRecentlyScraped() {
+/**
+ * Returns the first N documents that are expired and need to be rescraped.
+ * @returns Object[]>} resolves with the array of the expired artists, otherwise rejects with the error message
+ */
+/**
+ * Returns the first N documents that are expired and need to be rescraped.
+ * @param limit return the first N expired artists.
+ * @returns {Promise<Object[]>} array of expired artists.
+ */
+async function getExpiredArtists(limit=2000) {
     let params = {
-        query: `indexDate:[* TO NOW/DAY+1DAY]`,
+        query: `indexDate:[* TO NOW/DAY-${scrapy.scrape_expiry_time}DAY]`,
         fields: ["site", "page_link", "indexDate"],
         sort: "indexDate asc",
         params: {
             "q.op": "OR"
-        }
+        },
+        limit: limit
     }
-    // Search documents using objQuery
-    return (await runSearchQuery(params)).response.docs
+
+    result = []
+    await runSearchQuery(params)
+        .then((res)=> {
+            result = res.response.docs
+        })
+        .catch((err)=>{
+            console.error(err)
+        })
+    return result
 }
 
 /**
@@ -82,4 +101,10 @@ async function deleteAllDocuments() {
     console.log(await runDeleteQuery({query: "*:*"}))
 }
 
-module.exports = { runSearchQuery, runUpdateQuery, getLeastRecentlyScraped, deleteAllDocuments }
+module.exports = {
+    runSearchQuery,
+    runUpdateQuery,
+
+    getExpiredArtists,
+    deleteAllDocuments
+}

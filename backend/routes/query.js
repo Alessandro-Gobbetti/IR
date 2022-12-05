@@ -28,7 +28,7 @@ function parse_query_fields(obj) {
  * Runs a search query and returns the ranked documents.
  */
 router.get('/*', function(req, res) {
-    // Create query
+    // TODO: Add term weight
     let params = {
         ...parse_query_fields(req.query),
         params: {
@@ -47,7 +47,7 @@ router.get('/*', function(req, res) {
         })
         .catch((err)=>{
             console.log("ERROR:\n",err)
-            res.status(err.code).end()
+            res.status(500).end()
         })
 })
 
