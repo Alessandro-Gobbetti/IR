@@ -59,6 +59,10 @@ class KoFiSpider(scrapy.Spider):
                 meta={
                 'playwright': True,
                 'playwright_include_page': True,
+                'playwright_page_methods': [
+                        PageMethod('wait_for_selector',
+                                'div.kfds-text-limit-profilename-mobile span')
+                    ],
                 'errback': self.errback,
             })
 
@@ -83,6 +87,10 @@ class KoFiSpider(scrapy.Spider):
                 meta={
                     'playwright': True,
                     'playwright_include_page': True,
+                    'playwright_page_methods': [
+                        PageMethod('wait_for_selector',
+                                'div.kfds-text-limit-profilename-mobile span')
+                    ],
                     'errback': self.errback,
                 })
 
