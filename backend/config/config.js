@@ -33,13 +33,20 @@ const settings = {
         }
     },
     solr: {
-        host: '127.0.0.1',
-        port: '8983',
-        core: 'creators',
-        protocol: 'http'
+        connection: {
+            host: '127.0.0.1',
+            port: '8983',
+            core: 'creators',
+            protocol: 'http'
+        },
+        query: {
+            term_weights: {
+
+            }
+        }
     },
     scrapy: {
-        scrapy_folder_path: path.join(__dirname, "../../crawler"),
+        scrapy_folder_path: path.join(__dirname, "../../crawler/crawler"),
         // Abs path of folder where the scraped data is stored
         scrapy_json_output_dir: path.join(__dirname,"../../crawler/crawler/crawled"),
         python_venv: path.join(__dirname,"../../crawler/scrapyenv"),

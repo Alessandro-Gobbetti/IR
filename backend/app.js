@@ -1,3 +1,5 @@
+const scrapy = require("./modules/scrapy.js")
+
 // require framework and middleware dependencies
 const express = require('express');
 var cors = require('cors')
