@@ -3,6 +3,31 @@
     <SearchBar :initial-value="this.$route.query.q" :fetch-initial-value="true" :onchange="onchange" :onresultschange="onresultschange" />
 
     <SearchResults :results="results"/>
+    
+    <div v-if="is_loading" class="d-flex justify-content-center align-items-center h-50">
+      <v-progress-circular class="align-self-center"
+        :size="50"
+        color="black"
+        indeterminate
+      ></v-progress-circular>
+    </div>
+    <div v-else-if="(results.length===0)" class="d-flex flex-column align-center justify-center h-50">
+      <h1 class="text-center">No results found</h1>
+      <h3 class="text-center">Try searching for something else</h3>
+    </div>
+
+
+
+    <v-pagination 
+      v-if="results.length > 0" 
+      v-model="page"
+      :length="20"
+      :total-visible="5"
+      rounded="lg"
+      :elevation="3"
+    ></v-pagination>
+    
+
 
   </div>
 </template>
@@ -30,15 +55,18 @@ export default defineComponent({
 
   data: () => ({
     results: [],
+    is_loading: false,
   }),
 
   methods: {
     onchange(value) {
       router.push(`/search?q=${value}`)
       router.forward();
+      this.is_loading = true;
     },
     onresultschange(result) {
       this.results = result
+      this.is_loading = false;
     }
   }
 });
