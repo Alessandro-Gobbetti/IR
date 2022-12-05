@@ -1,6 +1,6 @@
 <template>
 <!--  TODO: call ArtistCardBig with props-->
-  <div>
+  <div class="searchResults">
     <ArtistCardBig v-for="(artist,idx) in results" :artist="artist" :expanded="idx===0" :key="artist.id"  />
 
   </div>
@@ -28,4 +28,7 @@ export default defineComponent({
 
 <style scoped>
 
+.searchResults {
+  width:50%;
+}
 </style>

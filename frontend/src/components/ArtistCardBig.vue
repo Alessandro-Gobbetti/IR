@@ -1,39 +1,44 @@
 <template>
-  <div class="artist_card_big" :class="expanded? 'expanded' : 'collapsed'" @click="openPageIfCollapsed">
-    <img v-if="expanded" class="banner" :src="artist.artist_banner" alt="artist banner" />
+  <div class="artist_card_big" :class="is_expanded? 'expanded' : 'collapsed'" v-on="is_expanded ? {} : {click : expandCard}">
+    <Transition name="slide-fade">
+      <img v-if="is_expanded" class="banner" :src="artist.artist_banner" alt="artist banner" @click="openArtistPage"/>
+    </Transition>
     <div class="artist">
-      <img class="pic" :src="artist.artist_image" alt="artist image" />
+      <img class="pic" :src="artist.artist_image" alt="artist image" @click="openArtistPage"/>
       <img class="site_logo" :src="getLogo()" alt=""/>
-      <h2 v-snip="{ lines: 1, mode: 'css' }" class="name">{{ artist.artist_name }}</h2>
+      <h2 v-snip="{ lines: 1, mode: 'css' }" class="name" @click="openArtistPage()">{{ artist.artist_name }}</h2>
       <p class="stats">
         <span v-if="artist.amount_subs">{{ artist.amount_subs }} subs</span>
         <span v-if="artist.amount_subs && artist.amount_post"> ・ </span>
         <span v-if="artist.amount_post">{{ artist.amount_post }} posts</span>
       </p>
       <div class="tags">
-        <div class="tag" v-for="tag in artist.tags" :key="tag">
-          <!-- TODO: onclick search for the tag -->
+        <div class="tag" v-for="tag in artist.tags" :key="tag" @click="searchTag(tag)">
           {{ tag }}
         </div>
       </div>
-      <p v-if="artist.bio" class="bio" v-snip="{ lines: expanded ? -1 : 1, mode: 'css' }">{{ artist.bio }}</p>
-      <p v-if="expanded && artist.bio_long" class="long_bio">{{artist.bio_long}}</p>
-      <div v-if="(show_tiers && expanded && artist.price_tiers_monthly.length > 0)" class="tiers">
+      <p v-if="artist.bio" class="bio" v-snip="{ lines: is_expanded ? -1 : 2, mode: 'css' }">{{ artist.bio }}</p>
+      <p v-if="is_expanded && artist.bio_long" class="long_bio">{{artist.bio_long}}</p>
+      <div v-if="(show_tiers && is_expanded && artist.price_tiers_monthly && artist.price_tiers_monthly.length > 0)" class="tiers">
         <h2 class="title">Price tiers</h2>
-        <div class="tier" v-for="idx in artist.price_tiers_monthly.length" :key="tier">
+        <div class="tier" v-for="idx in artist.price_tiers_monthly.length" :key="idx">
           <div class="tier_price">{{ artist.price_tiers_monthly[idx-1] }}</div>
           <div class="tier_title">{{ artist.price_tiers_title[idx-1] }}</div>
           <div class="tier_desc">{{ artist.price_tiers_description[idx-1] }}</div>
         </div>
       </div>
 
-      <div v-if="expanded" class="social_media">
+      <div v-if="is_expanded" class="social_media">
         <a v-for="social in artist.socialmedias" :key="social" :href="social" target="blank">
           <div class="tooltip">
             <v-icon class="social">{{getIconCode(social)}}</v-icon>
             <span class="tooltiptext">{{social}}</span>
           </div>  
         </a>
+      </div>
+      <div class="expand_collapse_icon">
+        <v-icon v-if="is_expanded" @click="collapseCard">mdi-chevron-up</v-icon>
+        <v-icon v-else>mdi-chevron-down</v-icon>
       </div>
     </div>
   </div>
@@ -49,16 +54,23 @@ export default defineComponent({
   props: {
     artist: {
       type: Object,
-      default: {"site": "ko-fi", "page_link": "https://ko-fi.com/kahahuna", "artist_name": "Kahahuna", "artist_image": "https://storage.ko-fi.com/cdn/useruploads/6e66cb54-1712-4b53-b172-d38f923edfc4.jpg", "artist_banner": "https://cdn.ko-fi.com/cdn/useruploads/jpg_f9560df2-dd82-43b1-a479-85d6450b06e9cover.jpg?v=17adc55b-1c19-44ec-9301-992d2abe75c6", "bio": "I'm Jess, a 39 year old artist and maker from Indiana. I love carving linocuts, ink and paint, webcomics and press bath bombs as my side hustle. You'll get a little bit of everything in my feed. Check out my monthly print and tub club tiers!", "bio_long": null, "amount_post": null, "amount_subs": 72, "price_tiers": [{"title": "Print of the Month Club", "monthly": "$15", "description": "Do you like getting physical mail? Me too. This benefit will feature a monthly exclusive original linocut just for members. I will tend to keep them smaller to keep the shipping in check, so the prints will likely range from 4x6\" to 5x7\" and may even be a linen fabric patch. Prints will be mailed within the first week of the month and include a handwritten note. Themes will coincide with the Tub Club tier! Worldwide shipping is available and included. Please allow time if ordering internationally. "}, {"title": "Tub Club", "monthly": "$25", "description": "What is Tub Club? Every month I will announce a theme for the next box. Subscriptions may be edited up until the 20th. For your $25, I will curate a seasonal box to be sent on the first week of the month. Domestic shipping is included.\n\nBoxes will include:\n1 soap\n1 large bath bomb\n1 surprise handmade item such as artwork, ornaments, candles, sugar scrubs, etc. (it's a surprise!)\n"}], "tags": ["Drawing & Painting", "Art", "Commissions", "Comics"], "socialmedias": ["https://instagram.com/Kahahuna_jess", "https://facebook.com/kahahuna", "https://twitter.com/kahahuna", "https://@kahahuna.tumblr.com", "https://www.twitch.tv/kahahuna", "https://www.tiktok.com/@kahahuna"]},
+      required: true,
     },
     expanded: {
       type: Boolean,
       default: false,
+      mutable: true,
     },
     show_tiers: {
       type: Boolean,
       default: true,
     },
+  },
+
+  data() {
+    return {
+      is_expanded: this.expanded,
+    };
   },
 
   methods: {
@@ -102,16 +114,42 @@ export default defineComponent({
       } else {
         return 'mdi-web';
       }
-    }
-  },
+    },
 
-  openPageIfCollapsed() {
-    // if(!this.expanded){
-      // open link
-      console.log("go to artist page: " + this.artist.page_link);
-      // window.open(this.artist.page_link);
-    // }
-  }
+    openArtistPage() {
+      window.location.replace(this.artist.page_link);
+    },
+
+    expandCard() {
+      this.is_expanded = true;
+      console.log("expanded");
+    },
+
+    collapseCard() {
+      this.is_expanded = false;
+      console.log("collapsed");
+    },
+
+    expandCardIfCollapsed() {
+      if (!this.is_expanded) {
+        this.expandCard();
+      }
+    },
+
+    expandCollapseCard() {
+      if (this.is_expanded) {
+        this.collapseCard();
+      } else {
+        this.expandCard();
+      }
+    },
+
+    searchTag(tag) {
+      this.$router.push({ name: "search", query: { q: `tags:${tag}` } });
+      this.$router.forward();
+    },
+} ,
+
 });
 </script>
 
@@ -119,8 +157,6 @@ export default defineComponent({
 <style scoped>
 
 .artist_card_big {
-  width: 75%;
-  margin-left: 10%;
   border-radius: 2vh;
 }
 
@@ -134,7 +170,7 @@ export default defineComponent({
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-.expanded img.banner{
+img.banner{
   width: 100%;
   height: 20vh;
   object-fit: cover;
@@ -160,11 +196,24 @@ export default defineComponent({
   padding-bottom: 2vh;
 }
 
+
+.pic {
+  /* crop to square */
+  grid-area: img;
+  object-fit: cover;
+  width: min(12vh, 100px);
+  height: min(12vh, 100px);
+  overflow: hidden;
+  border-radius: 50%;
+}
+.pic:hover {
+  cursor: pointer;
+  /* shadow */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
 .expanded img.pic {
   grid-area: img;
-  width: 100%;
-  border-radius: 100%;
-  overflow: hidden;
   /*move it up by 50%*/
   transform: translateY(-40%);
 }
@@ -182,7 +231,14 @@ export default defineComponent({
   margin: 0;
   padding: 0;
   font-size: 1.5rem;
+  transition: color 0.5s;
 }
+
+h2.name:hover {
+  cursor: pointer;
+  color: blue;
+}
+
 
 .expanded p.stats {
   grid-area: stats;
@@ -215,8 +271,6 @@ export default defineComponent({
   flex-wrap: wrap;
   margin: 0;
   padding: 0;
-  font-size: 0.8rem;
-  max-height: 0.8rem;
 }
 
 .expanded .tag {
@@ -226,6 +280,8 @@ export default defineComponent({
   padding: 0px 5px;
   font-variant: small-caps;
   transition: transform 0.2s;
+  height: 1.2rem;
+  font-size: 0.8rem;
 }
 .expanded .tag:hover {
   cursor: pointer;
@@ -251,7 +307,7 @@ export default defineComponent({
 .expanded .tier .tier_price {
   grid-area: price;
   font-weight: bold;
-  font-size: 3rem;
+  font-size: 2.5rem;
   align-self: start;
 }
 
@@ -323,7 +379,6 @@ export default defineComponent({
 
 
 
-
 .artist_card_big.collapsed {
   transition: box-shadow 0.5s;
   text-decoration: none;
@@ -347,13 +402,6 @@ export default defineComponent({
   border-radius: 2vh;
   padding: 1vh;
   grid-column-gap: 1vw;  
-}
-
-.collapsed img.pic {
-  grid-area: img;
-  width: 100%;
-  border-radius: 100%;
-  overflow: hidden;
 }
 
 .collapsed img.site_logo {
@@ -388,8 +436,6 @@ export default defineComponent({
   flex-wrap: wrap;
   margin: 0;
   padding: 0;
-  font-size: 0.8rem;
-  max-height: 0.8rem;
 }
 
 .collapsed .tag {
@@ -399,6 +445,8 @@ export default defineComponent({
   padding: 0px 5px;
   font-variant: small-caps;
   transition: transform 0.2s;
+  height: 1.2rem;
+  font-size: 0.8rem;
 }
 .collapsed .tag:hover {
   cursor: pointer;
@@ -407,12 +455,84 @@ export default defineComponent({
 
 .collapsed p.bio {
   grid-area: bio;
-  margin: 0;
+  margin-right: 3rem;
   padding: 0;
   font-size: 1rem;
 }
 .collapsed p.bio::first-letter {
   text-transform: capitalize;
 }
+
+
+
+.expand_collapse_icon {
+  position: absolute;
+  justify-self: end;
+  align-self: end;
+  font-size: 1.5rem;
+  z-index: 9999;
+  opacity: 0%;
+  transition: opacity 0.5s;
+}
+
+.expanded .expand_collapse_icon {
+  margin-right: -2vw;
+}
+
+
+.expand_collapse_icon:hover {
+  cursor: pointer;
+}
+
+.artist_card_big:hover .expand_collapse_icon {
+  display: block;
+  opacity: 100%;
+}
+
+
+
+
+
+
+/* TRANSITION */
+/**
+
+* {
+  transition: all 1.5s ease;
+}
+
+.slide-fade-enter-active {
+  transition: all 1.5s ease;
+  transform-origin: bottom;
+}
+
+.slide-fade-leave-active {
+  transition: all 1.5s ease;
+  transform-origin: bottom;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform-origin: bottom;
+  transform: scaleY(0.0);
+  opacity: 0;
+}
+
+
+
+.translate_animation {
+  animation: translate 1.5s ease;
+  transform: translateY(0.0);
+}
+
+@keyframes translate {
+  0% {
+    transform: translateY(0.0);
+  }
+  100% {
+    transform: translateY(-20vh);
+  }
+}**/
+
 
 </style>
