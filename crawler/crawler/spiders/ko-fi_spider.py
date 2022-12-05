@@ -100,18 +100,23 @@ class KoFiSpider(scrapy.Spider):
         # remove ' Supporters'
         if supporters is not None and len(supporters) > 0:
             supporters = supporters.split(' ')[0]
-        
+            # remove commas
+            supporters = supporters.replace(',', '')
+            
+            
         if supporters is not None and len(supporters) > 0:  
             # the last character may be a K or M
             if supporters[-1].upper() == 'K':
                 supporters = supporters[:-1].strip()
-                supporters = float(supporters) * 1000
+                supporters = int(float(supporters) * 1000)
             elif supporters[-1].upper() == 'M':
                 supporters = supporters[:-1].strip()
-                supporters = float(supporters) * 1_000_000
+                supporters = int(float(supporters) * 1_000_000)
             elif supporters.isdigit():
                 supporters = int(supporters)
         else:
+            supporters = None
+        if not type(supporters) == int:
             supporters = None
         
         pic = response.css('img#profilePicture::attr(src)').get()
