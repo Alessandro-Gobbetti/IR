@@ -3,6 +3,7 @@
  * Contains all the application settings and/or parameters.
  *
 */
+const path = require('path')
 
 const rate_limit = require("express-rate-limit");
 
@@ -38,10 +39,10 @@ const settings = {
         protocol: 'http'
     },
     scrapy: {
-        scrapy_folder_path: "",
-        // Relative path from scrapy folder to the folder where the scraped data is placed
-        scrapy_json_output_dir: "",
-        python_venv: "",
+        scrapy_folder_path: path.join(__dirname, "../../crawler"),
+        // Abs path of folder where the scraped data is stored
+        scrapy_json_output_dir: path.join(__dirname,"../../crawler/crawler/crawled"),
+        python_venv: path.join(__dirname,"../../crawler/scrapyenv"),
 
         // How often to check for sites to be rescraped
         scrape_check_ms: 1000*60*60*24, // every day
