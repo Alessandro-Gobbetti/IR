@@ -17,7 +17,6 @@ const exec = require('child_process').exec;
 async function getEntitiesToBeIndexed() {
     // TODO: Implement expired tags and searches
     let docs = await solr.getExpiredArtists()
-    // console.log(docs)
     return {
         tags: [],
         artists: docs.map(doc => {
@@ -42,7 +41,6 @@ function init() {
     setTimeout(func,1000)
 }
 
-init()
 
 /**
  * (Re)scrapes and indexes the links/search_terms/artists that either haven't been scraped in a long time,
@@ -126,5 +124,6 @@ function runConsoleCommand(command, cwd, stdout=true,stderr=true) {
 
 
 module.exports = {
-    scrape_necessary_links
+    init,
+    runConsoleCommand
 }

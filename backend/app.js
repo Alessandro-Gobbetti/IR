@@ -1,4 +1,5 @@
 const scrapy = require("./modules/scrapy.js")
+// scrapy.init()
 
 // require framework and middleware dependencies
 const express = require('express');

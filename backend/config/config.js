@@ -44,11 +44,11 @@ const settings = {
 
             },
             // How many results to retrieve with each search query by default.
-            page_size: 10
+            page_size: 20
         }
     },
     scrapy: {
-        DISABLE_SCRAPING: false,
+        DISABLE_SCRAPING: true,
 
         scrapy_folder_path: path.join(__dirname, "../../crawler/crawler"),
         // Abs path of folder where the scraped data is stored

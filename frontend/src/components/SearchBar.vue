@@ -139,6 +139,10 @@ export default defineComponent({
       immediate: true
     }
   },
+  async beforeMount() {
+    let filters = await store.getters.getFilters()
+    console.log(filters)
+  },
   data() {
     return {
       // Current value of the input field

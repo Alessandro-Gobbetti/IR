@@ -7,8 +7,8 @@ const {solr, scrapy} = require('../config/config.js')
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runSearchQuery(JSONquery) {
-    JSONquery.limit = JSONquery.limit | solr.query.page_size
-    return runQuery("select", JSONquery)
+    JSONquery.limit = JSONquery.limit !== undefined ? JSONquery.limit : solr.query.page_size
+    return runQueryOnCollection("select", JSONquery)
 }
 
 /**
@@ -17,7 +17,7 @@ function runSearchQuery(JSONquery) {
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runUpdateQuery(JSONquery) {
-    return runQuery("update", JSONquery)
+    return runQueryOnCollection("update", JSONquery)
 }
 
 /**
@@ -26,29 +26,42 @@ function runUpdateQuery(JSONquery) {
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runDeleteQuery(JSONquery) {
-    return runQuery("update", {'delete': JSONquery})
+    return runQueryOnCollection("update", {'delete': JSONquery})
 }
 
 
 /**
- * Runs a Solr query given a method handler and a JSON query obj.
+ * Runs a Solr collection query given a method handler and a JSON query obj.
  * @param {String} method_handler the method handler to be used by Solr.
  * @param JSONquery the JSON query obj.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
-function runQuery(method_handler, JSONquery) {
+function runQueryOnCollection(method_handler, JSONquery) {
+    return runQuery(`/solr/${solr.connection.core}/${method_handler}?commit=true`, 'POST',
+        {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }, JSONquery);
+}
+
+
+/**
+ * Runs any Solr query.
+ * @param {String} url the URL of the request.
+ * @param {String} method the HTTP method to use.
+ * @param {Object} header the HTTP header of the request.
+ * @param {Object} body the body of the HTTP request.
+ * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
+ */
+function runQuery(url,method, header, body) {
     return new Promise((resolve, reject) => {
         // console.log(`${solr.protocol}://${solr.host}:${solr.port}/solr/${solr.core}/${method_handler}? -d '${JSON.stringify(params)}'`)
-        const url = `${solr.connection.protocol}://${solr.connection.host}:${solr.connection.port}/solr/${solr.connection.core}/${method_handler}?commit=true`
-        console.log(url)
-        // console.log(JSONquery)
-        fetch(url,{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(JSONquery)
+        const requrl = `${solr.connection.protocol}://${solr.connection.host}:${solr.connection.port}${url}`
+        console.log(requrl)
+        fetch(requrl, {
+            method: method,
+            headers: header,
+            body: JSON.stringify(body)
         })
             .then((response) => response.json())
             .then((data) => {
