@@ -61,7 +61,7 @@ class KoFiSpider(scrapy.Spider):
                 'playwright_include_page': True,
                 'playwright_page_methods': [
                         PageMethod('wait_for_selector',
-                                'div.kfds-text-limit-profilename-mobile span')
+                                'div.kfds-c-srf-topdetail-wrapper div.kfds-font-bold > span')
                     ],
                 'errback': self.errback,
             })
@@ -79,7 +79,6 @@ class KoFiSpider(scrapy.Spider):
         for artist_url in artist_urls:
             # the url is relative to the base url
             artist_url = response.urljoin(artist_url)
-            # print(artist_url)
 
             yield scrapy.Request(
                 artist_url, 
@@ -89,7 +88,7 @@ class KoFiSpider(scrapy.Spider):
                     'playwright_include_page': True,
                     'playwright_page_methods': [
                         PageMethod('wait_for_selector',
-                                'div.kfds-text-limit-profilename-mobile span')
+                                'div.kfds-c-srf-topdetail-wrapper div.kfds-font-bold > span')
                     ],
                     'errback': self.errback,
                 })
@@ -103,7 +102,7 @@ class KoFiSpider(scrapy.Spider):
         print('\033[90m' + "\tParsing: " + response.url + '\033[0m')
 
 
-        name = response.css('div.kfds-text-limit-profilename-mobile span::text').get()
+        name = response.css('div.kfds-c-srf-topdetail-wrapper div.kfds-font-bold > span::text').get()
         supporters = response.css('span.kfds-c-profile-link-handle.kfds-font-clr-dark::text').get()
         # remove ' Supporters'
         if supporters is not None and len(supporters) > 0:

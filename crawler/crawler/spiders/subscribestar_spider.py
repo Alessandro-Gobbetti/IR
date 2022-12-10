@@ -14,13 +14,15 @@ class SubscribeStarSpider(scrapy.Spider):
     def __init__(self, tags=None, artists=None, searches=None, **kwargs):
         '''Initialize the spider if a list of artists is provided then only scrape those artists, else scrape all the website'''
         self.start_urls = []
+
+        if tags != "null":
+             self.start_urls = [
+                'https://www.subscribestar.com/stars?_page=true&page=1',
+            ]
+
         self.artists_urls = []
         if artists:
             self.artists_urls = artists.split(',')
-        else:
-            self.start_urls = [
-                'https://www.subscribestar.com/stars?_page=true&page=1',
-            ]
 
         super().__init__(**kwargs)
 
