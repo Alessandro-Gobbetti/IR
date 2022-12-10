@@ -49,7 +49,7 @@ router.get('/*', async function (req, res) {
             let time = process.hrtime(t1)
             const stats = {
                 found: response.response.numFound,
-                page: parseInt(Math.floor(response.response.start / config.solr.query.page_size)),
+                page: parseInt(Math.floor(response.response.start / config.solr.query.page_size)) + 1,
                 total_pages: parseInt(Math.ceil(response.response.numFound / config.solr.query.page_size)),
                 // Request execution time
                 exec_time: time[0]+(time[1]/1000000000)

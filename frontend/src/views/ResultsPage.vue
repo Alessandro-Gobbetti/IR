@@ -20,9 +20,9 @@
 
     <v-pagination 
       v-if="results.docs.length > 0"
-      v-model="page"
-      :length="20"
-      :total-visible="5"
+      :v-model="results.stats.page"
+      :length="results.stats.total_pages"
+      total-visible=7
       rounded="lg"
       :elevation="3"
     ></v-pagination>
