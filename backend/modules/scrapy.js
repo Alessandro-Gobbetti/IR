@@ -81,7 +81,7 @@ async function scrape_necessary_links() {
     for (const file of files) {
         const filepath = path.join(scrapy.scrapy_json_output_dir, file)
         console.log(`Indexing '${filepath}' ...`)
-        const content = JSON.parse(await fs.promises.readFile(filepath))
+        const content = JSON.parse( (await fs.promises.readFile(filepath)).toString() || '[]')
 
         // console.log("FILTER: ",content.filter((val)=>{val.artist_name === undefined}))
 
