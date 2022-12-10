@@ -1,6 +1,6 @@
 <template>
   <div class="form">
-    <img src="@/assets/images/logo.png" alt="logo" class="logo">
+    <img src="@/assets/images/logo1.png" alt="logo" class="logo" @click="goHomepage">
 
     <input
         ref="input"
@@ -171,10 +171,21 @@ export default defineComponent({
     async fetchResults(query) {
       this.last_query = query
       // TODO: Once there are complex queries (filters ecc). Parse it into string form here
-      return await store.getters.getResults(`q=${query}`)
+
+      let query_str = `q=${query}`
+      query_str += this.website_list_value.length > 0 ? ` AND site:(${this.website_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
+      query_str += this.category_list_value.length > 0 ? ` AND tags:(${this.category_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
+      query_str += ` AND amount_subs:[${this.subs_range_value[0]} TO ${this.subs_range_value[1]}]`
+
+      console.log(query_str)
+  
+      return await store.getters.getResults(query_str)
     },
     toggleAdvancedSearch(){
       this.show_advanced_search = !this.show_advanced_search
+    },
+    goHomepage(){
+      this.$router.push("/");
     },
   },
   props: {
@@ -229,6 +240,12 @@ export default defineComponent({
   grid-area: logo;
   width: 100%;
   height: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo:hover {
+  cursor: pointer;
+  transform: rotate(360deg) scale(1.2);
 }
 
 .form-control {

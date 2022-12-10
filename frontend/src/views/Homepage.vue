@@ -1,6 +1,6 @@
 <template>
-  <div class="h-100 w-100 d-flex flex-column justify-center align-center">
-    <img class="rounded-lg" src="@/assets/images/rambo.gif" />
+  <div class="h-100 w-100 d-flex flex-column align-center">
+    <img class="h-25" src="@/assets/images/logo1.png" />
     <SearchBar :onchange="onchange" />
   </div>
 </template>
