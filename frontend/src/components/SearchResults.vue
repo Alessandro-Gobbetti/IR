@@ -1,7 +1,7 @@
 <template>
 <!--  TODO: call ArtistCardBig with props-->
   <div class="searchResults">
-    <ArtistCardBig v-for="(artist,idx) in results" :artist="artist" :expanded="idx===0" :key="artist.id"  />
+    <ArtistCardBig v-for="(artist,idx) in artists" :artist="artist" :expanded="idx===0" :key="artist.id"  />
 
   </div>
 </template>
@@ -14,7 +14,7 @@ import {defineComponent} from "vue";
 export default defineComponent({
   name: "SearchResults",
   props: {
-    results : {
+    artists : {
       type: [Object],
       default: []
     }

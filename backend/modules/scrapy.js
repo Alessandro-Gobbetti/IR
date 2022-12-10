@@ -94,6 +94,8 @@ async function scrape_necessary_links() {
             })
 
         // TODO: Update "last indexed" dates.
+        // TODO: Delete JSON file after indexing
+        // TODO: Periodic database dump
     }
 }
 

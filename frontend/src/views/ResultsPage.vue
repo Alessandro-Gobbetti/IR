@@ -2,7 +2,7 @@
   <div class="h-100 w-100 d-flex flex-column align-center">
     <SearchBar :initial-value="this.$route.query.q" :fetch-initial-value="true" :onchange="onchange" :onresultschange="onresultschange" />
 
-    <SearchResults :results="results"/>
+    <SearchResults :artists="results.docs"/>
     
     <div v-if="is_loading" class="d-flex justify-content-center align-items-center h-50">
       <v-progress-circular class="align-self-center"
@@ -11,7 +11,7 @@
         indeterminate
       ></v-progress-circular>
     </div>
-    <div v-else-if="(results.length===0)" class="d-flex flex-column align-center justify-center h-50">
+    <div v-else-if="(results.docs.length===0)" class="d-flex flex-column align-center justify-center h-50">
       <h1 class="text-center">No results found</h1>
       <h3 class="text-center">Try searching for something else</h3>
     </div>
@@ -19,7 +19,7 @@
 
 
     <v-pagination 
-      v-if="results.length > 0" 
+      v-if="results.docs.length > 0"
       v-model="page"
       :length="20"
       :total-visible="5"
@@ -54,7 +54,10 @@ export default defineComponent({
   },
 
   data: () => ({
-    results: [],
+    results: {
+      stats: {},
+      docs: []
+    },
     is_loading: false,
   }),
 

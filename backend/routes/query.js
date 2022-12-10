@@ -42,8 +42,12 @@ router.get('/*', function(req, res) {
     // Search documents using objQuery
     solr.runSearchQuery(params)
         .then((response)=> {
+            const stats = {
+                found: response.response.numFound
+            }
+            const results = {stats, docs: response.response.docs}
             console.log("RESPONSE:\n",response)
-            res.json(response.response.docs)
+            res.json(results)
         })
         .catch((err)=>{
             console.log("ERROR:\n",err)
