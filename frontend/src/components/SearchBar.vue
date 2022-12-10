@@ -6,10 +6,10 @@
         ref="input"
         class="form-control"
         placeholder="Search"
-        :value="value"
+        :value="this.getTextFromQuery(value)"
         @keyup.enter="(e)=>{
           this.value = e.target.value
-          this.onchange(this.value)
+          this.onchange(stringifyQuery(this.value))
           performQuery();
         }"
         :oninput="(e)=>{
@@ -133,6 +133,7 @@ export default defineComponent({
           if (this.initialValue == this.value && this.last_query !== null)
             return
         this.value = this.initialValue;
+        this.initFiltersFromQuery(this.initialValue);
         if(this.fetchInitialValue)
           this.performQuery()
       },
@@ -166,6 +167,45 @@ export default defineComponent({
   },
 
   methods: {
+    stringifyQuery(query) {
+      let query_str = `${query}`
+      query_str += this.website_list_value.length > 0 ? ` AND site:(${this.website_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
+      query_str += this.category_list_value.length > 0 ? ` AND tags:(${this.category_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
+
+      if (this.subs_range_value[0] != this.subs_range[0] || this.subs_range_value[1] != this.subs_range[1]) {
+        query_str += ` AND amount_subs:[${this.subs_range_value[0]} TO ${this.subs_range_value[1]}]`
+      }
+      // TODO: Add price range
+
+      return query_str
+    },
+    initFiltersFromQuery(query) {
+      // parse query to set filters
+      let query_arr = query.split(' AND ')
+      for (let filter of query_arr) {
+        let [field, value] = filter.split(':')
+        switch (field) {
+          case 'site':
+            this.website_list_value = value.replace('(', '').replace(')', '').split(' ')
+            break;
+          case 'tags':
+            this.category_list_value = value.replace('(', '').replace(')', '').split(' ')
+            break;
+          case 'amount_subs':
+            this.subs_range_value = value.replace('[', '').replace(']', '').split(' TO ')
+            break;
+          case 'price':
+            this.price_range_value = value.replace('[', '').replace(']', '').split(' TO ')
+            break;
+          default:
+            break;
+        }
+      }
+    },
+    getTextFromQuery(query) {
+      // the text to display in the input field
+      return query.replace('q=', '').split(' AND ')[0]
+    },
     // Runs the query and calls the callback function with the fetched results
     async performQuery(){
       // Avoids performing a fetch if the callback function is not defined.
@@ -175,16 +215,8 @@ export default defineComponent({
     // Async runs a query and returns the results.
     async fetchResults(query) {
       this.last_query = query
-      // TODO: Once there are complex queries (filters ecc). Parse it into string form here
-
-      let query_str = `q=${query}`
-      query_str += this.website_list_value.length > 0 ? ` AND site:(${this.website_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
-      query_str += this.category_list_value.length > 0 ? ` AND tags:(${this.category_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
-      query_str += ` AND amount_subs:[${this.subs_range_value[0]} TO ${this.subs_range_value[1]}]`
-
-      console.log(query_str)
-  
-      return await store.getters.getResults(query_str)
+      
+      return await store.getters.getResults(`q=${query}`)
     },
     toggleAdvancedSearch(){
       this.show_advanced_search = !this.show_advanced_search
