@@ -124,6 +124,21 @@ import store from "@/store";
 
 export default defineComponent({
   name: "SearchBar",
+  watch: {
+    // Listener running on mount and when prop 'initialValue' changes.
+    'initialValue': {
+      handler() {
+        // Does not do anything if it's the same value and has already fetched it.
+        if (this.initialValue == this.value && this.last_query)
+          if (this.initialValue == this.value && this.last_query !== null)
+            return
+        this.value = this.initialValue;
+        if(this.fetchInitialValue)
+          this.performQuery()
+      },
+      immediate: true
+    }
+  },
   data() {
     return {
       // Current value of the input field
@@ -143,20 +158,6 @@ export default defineComponent({
       subs_range_value: [0, 1000],
       price_range_value: [0, 250],
 
-    }
-  },
-  watch: {
-    // Listener running on mount and when prop 'initialValue' changes.
-    'initialValue': {
-      handler() {
-        // Does not do anything if it's the same value and has already fetched it.
-        if (this.initialValue == this.value && this.last_query !== null)
-          return
-        this.value = this.initialValue;
-        if(this.fetchInitialValue)
-          this.performQuery()
-      },
-      immediate: true
     }
   },
 

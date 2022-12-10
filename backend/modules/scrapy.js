@@ -63,11 +63,11 @@ async function scrape_necessary_links() {
 
     const crawler_names = ["ko-fi", "patreon", "subscribestar"]
 
-    const {tags, artists, searches} = getEntitiesToBeIndexed()
+    const {tags, artists, searches} = await getEntitiesToBeIndexed()
 
     const command = [
         `source ${path.join(scrapy.python_venv, "/bin/activate")}`,
-        crawler_names.map((crawler) => scrapy_command(crawler, tags, artists, searches, postfix))
+        crawler_names.map((crawler) => scrapy_command(crawler, tags, artists.filter(artist=>artist.spider==crawler).map(artist=>artist.link), searches, postfix))
     ].flat().join(" && ")
 
 

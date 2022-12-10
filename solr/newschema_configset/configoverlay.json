@@ -3,6 +3,6 @@
     "update.autoCreateFields":true,
     "_designer.enableDynamicFields":true,
     "_designer.copyFrom":"_default",
-    "_designer.enableNestedDocs":true,
+    "_designer.enableNestedDocs":false,
     "_designer.languages":[],
-    "_designer.publishedVersion":13}}
+    "_designer.publishedVersion":2}}
