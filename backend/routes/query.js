@@ -76,12 +76,22 @@ router.get('/*', async function (req, res) {
     // Measure request execution time. Gets sent to the client as a stat
     const t1 = process.hrtime();
 
-    // TODO: Add term weight
+    // example
+    //    http://localhost:8983/solr/techproducts/select?q=video&defType=edismax&qf=features^20.0+text^0.3
+
+
+        // TODO: Add term weight
     let params = {
         ...parse_query_fields(req.query),
         params: {
+            defType : 'edismax',
+            qf: ['artist_name^200.0','bio^2.0', "bio_long", "tags^10.0", 'socialmedias^2', 'site^0.5'],
+            df: ['artist_name','bio', "bio_long", "tags", 'socialmedia', 'site'],
+            // bq: 'cat:electronics^5.0',
+            // boost: "amount_subs",
+            bf: 'log(amount_subs)',
+
             "q.op": "OR",
-            "df": "all",
             "indent": true
         },
         fields: "*,score"
