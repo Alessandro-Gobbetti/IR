@@ -61,7 +61,7 @@ function runQuery(url,method, header, body) {
         fetch(requrl, {
             method: method,
             headers: header,
-            body: JSON.stringify(body)
+            ...(body ? {body: JSON.stringify(body)} : {})
         })
             .then((response) => response.json())
             .then((data) => {
@@ -104,6 +104,49 @@ async function getExpiredArtists(limit=2000) {
             console.error(err)
         })
     return result
+}
+
+/**
+ * Returns the statistics about the collection (eg the amount of categories, the min/max amount of subs/prices ecc).
+ * @returns {Promise<{subs: [string,string], price: [string,string], sites: [], tags: []}|void>} resolves with the statistics or rejects in case of error.
+ */
+async function getStatistics() {
+    return await runSearchQuery({
+        query: "*:*",
+        params : {
+            'facet' : 'on',
+            'facet.field': ["site","tags"],
+            'facet.sort' :'count',
+
+            'facet.limit': '-1'
+        },
+        'facet' : {
+            "min_subs" : "min(amount_subs)",
+            "max_subs" : "max(amount_subs)",
+
+            "min_price" : "min(price_tiers_monthly)",
+            "max_price" : "max(price_tiers_monthly)",
+        },
+        limit: 0
+    }).then(data=> {
+        function map_facet_count(facet_field) {
+            let res = []
+            for(let i = 0 ; i<facet_field.length ; i+=2) {
+                res.push({title: facet_field[i], value: facet_field[i+1]})
+            }
+            return res
+        }
+        const sites = data.facet_counts.facet_fields.site
+        const tags = data.facet_counts.facet_fields.tags
+
+        return {
+            sites: map_facet_count(sites),
+            tags: map_facet_count(tags),
+
+            price: [data.facets.min_price, data.facets.max_price],
+            subs: [data.facets.min_subs, data.facets.max_subs],
+        }
+    }).catch(console.log)
 }
 
 /**
