@@ -10,7 +10,7 @@
                            color="black"
                            indeterminate
       ></v-progress-circular>
-      <div v-else class="mt-4 w-50 justify-center align-center">
+      <div v-else class="mt-3 w-50 justify-center align-center">
         <template v-for="(tag,idx) in this.tags.slice(0,20)" >
           <router-link style="text-decoration: none;" :to="`/search?q= AND tags=(${tag.title.toLowerCase()})`">
             <v-chip class="ma-1 text-orange-darken-4 category">

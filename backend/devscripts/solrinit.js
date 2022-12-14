@@ -1,5 +1,6 @@
 const solr = require("../modules/solr.js");
 const path = require("path");
+const mongodb = require('../modules/mongodb')
 const {scrapy} = require("../config/config");
 const fs = require("fs");
 
@@ -10,7 +11,7 @@ const fs = require("fs");
 
 
 
-indexFiles(['subscribestar-v3.json','kofi-v4.json','patreon-v3.json'])
+indexFiles(['subscribestar-v5.json','kofi-v5.json','patreon-v3.json']).then(()=>process.exit())
 
 
 /**
@@ -36,4 +37,10 @@ async function indexFiles(files) {
                 console.log("ERR: ", data)
             })
     }
+    const stats = await solr.getStatistics()
+
+    await mongodb.removeAllTags();
+    await mongodb.removeAllSearchQueries()
+    await mongodb.addScrapedTags(stats.tags.map(tag=>tag.title))
+    console.log(stats)
 }

@@ -12,8 +12,27 @@ function runSearchQuery(JSONquery) {
 }
 
 /**
+ * Runs a Solr query with '/mlt' as the method handler.
+ * By default, the limit is set from the config value.
+ * @param JSONquery the Solr JSON query object.
+ * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
+ */
+function runMoreLikeThisQuery(JSONquery) {
+    JSONquery.limit = JSONquery.limit !== undefined ? JSONquery.limit : solr.query.page_size
+
+    // TODO: fix this, figure out how to pass a json body to the query
+    let url = `/solr/${solr.connection.core}/mlt?q=${JSONquery.query}&${Object.keys(JSONquery.params).map(key => `${key}=${JSONquery.params[key]}`).join('&')}`
+    return runSolrQuery(url, 'POST',
+        {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+    // return runQueryOnCollection("mlt", JSONquery)
+}
+
+/**
  * Runs a Solr query with '/update' as the method handler.
- * @param {Object|Object[]} JSONquery the Solr JSON query object.
+ * @param {Object} JSONquery the Solr JSON query object.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runUpdateQuery(JSONquery) {
@@ -22,7 +41,7 @@ function runUpdateQuery(JSONquery) {
 
 /**
  * Runs a Solr query with '/update' as the method handler and the delete keyword.
- * @param {Object|Object[]} JSONquery the Solr JSON query object.
+ * @param {Object} JSONquery the Solr JSON query object.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runDeleteQuery(JSONquery) {
@@ -33,11 +52,11 @@ function runDeleteQuery(JSONquery) {
 /**
  * Runs a Solr collection query given a method handler and a JSON query obj.
  * @param {String} method_handler the method handler to be used by Solr.
- * @param JSONquery the JSON query obj.
+ * @param {Object} JSONquery the JSON query obj.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
 function runQueryOnCollection(method_handler, JSONquery) {
-    return runQuery(`/solr/${solr.connection.core}/${method_handler}?commit=true`, 'POST',
+    return runSolrQuery(`/solr/${solr.connection.core}/${method_handler}?commit=true`, 'POST',
         {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
@@ -53,11 +72,12 @@ function runQueryOnCollection(method_handler, JSONquery) {
  * @param {Object} body the body of the HTTP request.
  * @returns {Promise<Object>} resolves with Solr's response if the query was carried out successfully and rejects otherwise with the error message.
  */
-function runQuery(url,method, header, body) {
+function runSolrQuery(url, method, header, body) {
     return new Promise((resolve, reject) => {
         // console.log(`${solr.protocol}://${solr.host}:${solr.port}/solr/${solr.core}/${method_handler}? -d '${JSON.stringify(params)}'`)
         const requrl = `${solr.connection.protocol}://${solr.connection.host}:${solr.connection.port}${url}`
         console.log(requrl)
+        console.log(body)
         fetch(requrl, {
             method: method,
             headers: header,
@@ -75,13 +95,10 @@ function runQuery(url,method, header, body) {
 
 // HELPER METHODS
 
+
 /**
  * Returns the first N documents that are expired and need to be rescraped.
- * @returns Object[]>} resolves with the array of the expired artists, otherwise rejects with the error message
- */
-/**
- * Returns the first N documents that are expired and need to be rescraped.
- * @param limit return the first N expired artists.
+ * @param {Number=2000} limit return the first N expired artists.
  * @returns {Promise<Object[]>} array of expired artists.
  */
 async function getExpiredArtists(limit=2000) {
@@ -159,8 +176,11 @@ async function deleteAllDocuments() {
 
 module.exports = {
     runSearchQuery,
+    runMoreLikeThisQuery,
     runUpdateQuery,
+    runSolrQuery,
 
     getExpiredArtists,
-    deleteAllDocuments
+    deleteAllDocuments,
+    getStatistics,
 }

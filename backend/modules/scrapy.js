@@ -2,7 +2,7 @@ const {scrapy} = require('../config/config');
 const solr = require("./solr.js");
 const path = require('path');
 const fs = require("fs");
-
+const mongodb = require("../modules/mongodb.js")
 const exec = require('child_process').exec;
 
 
@@ -14,20 +14,21 @@ const exec = require('child_process').exec;
  *  - Scraping search results for queries whose results the users flagged as incorrect.
  * @returns {Promise<{searches: String[], artists: {spider: String, link: String}[], tags: String[]}>}
  */
-async function getEntitiesToBeIndexed() {
-    // TODO: Implement expired tags and searches
-    let docs = await solr.getExpiredArtists()
+async function getEntitiesToBeIndexed(limit=1000) {
+    [docs, tags, searches] = await Promise.all([solr.getExpiredArtists(limit), mongodb.getExpiredTags(limit), mongodb.getSearchQueriesToScrape(limit)])
+
     return {
-        tags: [],
         artists: docs.map(doc => {
             return {
                 spider: doc.site,
                 link: doc.page_link
             }
         }),
-        searches: []
+        tags: tags.map(tag=>tag.tag),
+        searches: searches.map(search=>search.query)
     }
 }
+setTimeout(async () => console.log(await getEntitiesToBeIndexed()),3000)
 
 /**
  * Periodically runs scrapy to rescrape expired documents
@@ -90,11 +91,15 @@ async function scrape_necessary_links() {
             .catch(data => {
                 console.log("ERR: ", data)
             })
-
-        // TODO: Update "last indexed" dates.
-        // TODO: Delete JSON file after indexing
-        // TODO: Periodic database dump
     }
+
+    await mongodb.addScrapedTags(tags)
+    await mongodb.removeSearchQueries(searches)
+
+    // TODO: If scraping an artist returned 404, delete him from Solr.
+    // TODO: Delete JSON file after indexing
+    // TODO: Periodic database dump
+
 }
 
 
