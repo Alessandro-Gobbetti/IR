@@ -291,7 +291,6 @@ export default defineComponent({
     // Listener running on mount and when prop 'queryParam' changes.
     'queryParam': {
       handler() {
-        console.log("PORCODIO", this.queryParam, this.curr_params)
         // Does not do anything if it's the same value and has already fetched it.
         if (this.queryParam === this.curr_params && this.last_query)
             return
