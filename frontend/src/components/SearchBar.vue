@@ -77,7 +77,7 @@
                 <span style="font-size: 0.7em;">{{ item.value }}</span>
               </v-chip>
               <span
-                v-if="index == 2"
+                v-if="index === 2"
                 class="text-grey text-caption align-self-center"
               >
                 (+{{ category_list_value.length - 2 }})
@@ -171,7 +171,6 @@ export default defineComponent({
 
   methods: {
     buildBackendFilterUrl(query) {
-      // let query_str = `${this.tokenizeQuery(query)}`
       let query_str = `${query}`
       query_str += this.website_list_value.length > 0 ? ` AND site:(${this.website_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
       query_str += this.category_list_value.length > 0 ? ` AND tags:(${this.category_list_value.map(x => x.toLowerCase()).join(' ')})` : ''
@@ -182,46 +181,6 @@ export default defineComponent({
       // TODO: Add price range
 
       return query_str
-    },
-    // add stars and other stuff to the query
-    // ciao "mamma" -> *ciao* mamma
-    tokenizeQuery(query) {
-      if(query === undefined)
-        return
-      let query_arr = query.split(' ');
-      for (let i = 0; i < query_arr.length; i++) {
-        let word = query_arr[i];
-        if (word.length === 0 || word.startsWith("tags:") || word.startsWith("site:") || word.startsWith("page_link:")) {
-          continue;
-        }
-        // check if starts and ends with quotes
-        if (word[0] === '"' && word[word.length - 1] === '"') {
-          // remove quotes
-          query_arr[i] = word.slice(1, word.length - 1);
-        } else {
-          // add stars
-          query_arr[i] = `*${word}*`;
-        }
-      }
-      return query_arr.join(' ');
-    },
-    detokenizeQuery(query){
-      let query_arr = query.split(' ');
-      for (let i = 0; i < query_arr.length; i++) {
-        let word = query_arr[i];
-        if (word.length === 0 || word.startsWith("tags:") || word.startsWith("site:") || word.startsWith("page_link:")) {
-          continue;
-        }
-        // check if starts and ends with quotes
-        if (word[0] === '*' && word[word.length - 1] === '*') {
-          // remove stars
-          query_arr[i] = word.slice(1, word.length - 1);
-        } else {
-          // add quotes
-          query_arr[i] = `"${word}"`;
-        }
-      }
-      return query_arr.join(' ');
     },
     initFiltersFromBackendFilterUrl(query) {
       if(query===undefined)
@@ -263,9 +222,10 @@ export default defineComponent({
       }
     },
     onenterkey(e) {
-      this.curr_params.q = this.buildBackendFilterUrl(e.target.value)
-      this.onchange(this.curr_params.q)
-      // performQuery();
+      if (e.target.value.length > 0) {
+        this.curr_params.q = this.buildBackendFilterUrl(e.target.value)
+        this.onchange(this.curr_params.q)
+      }
     },
     // Async runs a query and returns the results.
     async fetchResults(query,page=1) {
