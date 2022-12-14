@@ -6233,9 +6233,9 @@ vue-cli-plugin-vuetify@~2.5.8:
     semver "^7.1.2"
     shelljs "^0.8.3"
 
-vue-cookies@^1.8.1:
+vue-cookies@^1.8.2:
   version "1.8.2"
-  resolved "https://registry.npmjs.org/vue-cookies/-/vue-cookies-1.8.2.tgz"
+  resolved "https://registry.yarnpkg.com/vue-cookies/-/vue-cookies-1.8.2.tgz#39515fa09ebb585a50ac86c0e182a6b9307dc6ad"
   integrity sha512-+NfoC5l+7ybuVwpnqsf52qndnoYMjEb4EFhX4/j9RzzQP00dNzuJELsWuW2p8omNUzNlSgWGVyyWoOeJr347tw==
 
 vue-demi@latest:

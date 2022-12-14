@@ -1,33 +1,24 @@
 <template>
   <div class="h-100 w-100 d-flex flex-column align-center">
-    <SearchBar :initial-value="this.$route.query.q" :fetch-initial-value="true" :onchange="onchange" :onresultschange="onresultschange" />
+    <SearchBar :queryParam="this.$route.query" :fetch-initial-value="true" :onchange="this.onquerychange" :onresultschange="onresultschange" />
 
-    <SearchResults :artists="results.docs"/>
-    
-    <div v-if="is_loading" class="d-flex justify-content-center align-items-center h-50">
-      <v-progress-circular class="align-self-center"
-        :size="50"
-        color="black"
-        indeterminate
-      ></v-progress-circular>
+
+    <div class="results">
+      <SearchResults class="w-75" :loading="is_loading" :results="results" />
+      <MoreLikeThis class="w-25"/>
     </div>
-    <div v-else-if="(results.docs.length===0)" class="d-flex flex-column align-center justify-center h-50">
-      <h1 class="text-center">No results found</h1>
-      <h3 class="text-center">Try searching for something else</h3>
-    </div>
-
-
 
     <v-pagination 
-      v-if="results.docs.length > 0"
-      :v-model="results.stats.page"
+      v-if="results.stats.total_pages > 1"
+      :model-value="results.stats.page"
+      @update:model-value="onpaginationchange"
       :length="results.stats.total_pages"
       total-visible=7
       rounded="lg"
       :elevation="3"
+      class="mb-10"
     ></v-pagination>
     
-
 
   </div>
 </template>
@@ -40,6 +31,7 @@ import SearchBar from "@/components/SearchBar.vue";
 import ArtistCardBig from "@/components/ArtistCardBig.vue";
 import ArtistCard from "@/components/ArtistCard.vue";
 import SearchResults from "@/components/SearchResults.vue";
+import MoreLikeThis from "@/components/MoreLikeThis.vue";
 import store from "@/store";
 import router from "@/router";
 
@@ -51,6 +43,7 @@ export default defineComponent({
     SearchBar,
     ArtistCard,
     ArtistCardBig,
+    MoreLikeThis,
   },
 
   data: () => ({
@@ -62,16 +55,49 @@ export default defineComponent({
   }),
 
   methods: {
-    onchange(value) {
-      router.push(`/search?q=${value}`)
-      router.forward();
+    async onquerychange(value) {
+      console.log(value);
+      // await router.push({path:'/search', query: {q: value}})
+      // router.forward();
+      await router.push({path: '/search', query: {q:value, token: Math.random()}})
+      router.forward()
       this.is_loading = true;
     },
     onresultschange(result) {
-      this.results = result
+      // check if the results are from mlt query
+      if (result && result.match && result.match.numFound > 0) {
+        this.results =  {
+          stats: {
+            page: 1,
+            total_pages: 1,
+            total_results: result.response.docs.length
+          },
+          docs: result.response.docs
+        };
+      } else {
+        this.results = result
+      }
       this.is_loading = false;
+    },
+    async onpaginationchange(e) {
+      await router.push({path: '/search', query: {...this.$route.query, page: e}})
+      router.forward()
+      window.scrollTo({top: 0, behavior: 'smooth'});
+      // this.$route.query.page = e
     }
   }
 });
 </script>
 
+<style scoped>
+  .results {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100%;
+    column-gap: 2vh;
+    padding: 2vh;
+  }
+
+</style>

@@ -1,5 +1,8 @@
 <template>
   <div class="artist_card_big" :class="is_expanded? 'expanded' : 'collapsed'" v-on="is_expanded ? {} : {click : expandCard}">
+    <v-btn v-if="is_expanded" @click="findSimilar" class="find-similar">
+      <v-icon>mdi-magnify</v-icon>
+    </v-btn>
     <Transition name="slide-fade">
       <img v-if="is_expanded" class="banner" :src="artist.artist_banner" alt="artist banner" @click="openArtistPage"/>
     </Transition>
@@ -17,14 +20,28 @@
           {{ tag }}
         </div>
       </div>
-      <p v-if="artist.bio" class="bio" v-snip="{ lines: is_expanded ? -1 : 2, mode: 'css' }">{{ artist.bio }}</p>
-      <p v-if="is_expanded && artist.bio_long" class="long_bio">{{artist.bio_long}}</p>
+      <p v-if="artist.bio" class="bio" >
+        <!--bold every word matching the query-->
+        <span v-for="(word, idx) in artist.bio.split(' ')" :key="word" class="two-lines">
+          <span v-if="(idx <= 40 || is_expanded) && this.query.includes(word.trim().toLowerCase())"><b>{{word}}</b></span>
+          <span v-else-if="idx<=40 || is_expanded">{{word}}</span>
+          <span v-if="(idx===40 && !is_expanded)">...</span>
+          <span>{{" "}}</span>
+        </span>
+      </p>
+      <p v-if="is_expanded && artist.bio_long" class="long_bio">
+        <!--bold every word matching the query-->
+        <span v-for="word in artist.bio_long.split(' ')" :key="word">
+          <span v-if="this.query.includes(word.trim().toLowerCase())"><b>{{word + " "}}</b></span>
+          <span v-else>{{word+ " "}}</span>
+        </span>
+      </p>
       <div v-if="(show_tiers && is_expanded && artist.price_tiers_monthly && artist.price_tiers_monthly.length > 0)" class="tiers">
         <h2 class="title">Price tiers</h2>
         <div class="tier" v-for="idx in artist.price_tiers_monthly.length" :key="idx">
-          <div class="tier_price">{{ artist.price_tiers_monthly[idx-1] }}</div>
-          <div class="tier_title">{{ artist.price_tiers_title[idx-1] }}</div>
-          <div class="tier_desc">{{ artist.price_tiers_description[idx-1] }}</div>
+          <div v-if="artist.price_tiers_monthly" class="tier_price">{{ artist.price_tiers_monthly[idx-1] }}</div>
+          <div v-if="artist.price_tiers_title" class="tier_title">{{ artist.price_tiers_title[idx-1] }}</div>
+          <div v-if="artist.price_tiers_description" class="tier_desc">{{ artist.price_tiers_description[idx-1] }}</div>
         </div>
       </div>
 
@@ -41,12 +58,14 @@
         <v-icon v-else>mdi-chevron-down</v-icon>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
 // Components
 import { defineComponent } from "vue";
+import store from "@/store";
 
 export default defineComponent({
   name: "ArtistCardBig",
@@ -70,6 +89,7 @@ export default defineComponent({
   data() {
     return {
       is_expanded: this.expanded,
+      query: this.getQueryWords(),
     };
   },
 
@@ -87,13 +107,22 @@ export default defineComponent({
       }
     },
 
+    getQueryWords() {
+      if(this.$route.query.q === undefined)
+        return []
+      let query = (this.$route.query.q).split("AND")[0].split(' ')
+      // remove empty strings
+      query = query.filter((word) => word !== "")
+      // remove * or " at beginning and end of words
+      query = query.map((word) => word.replace(/["*]/g, "").toLowerCase())
+      return query;
+    },
+
     getIconCode(social){
       // parse url to get website name
       let url = new URL(social);
       let host = url.hostname.replace("www.", "");
       host = host.split(".")[0];
-
-      console.log(host);
 
       let supported_websites = [
         'facebook',
@@ -117,7 +146,23 @@ export default defineComponent({
     },
 
     openArtistPage() {
+      this.addCookies(this.artist.page_link);
       window.location.replace(this.artist.page_link);
+    },
+
+    addCookies(url){
+      if (this.$cookies.isKey('visited_artists')) {
+        let visited_artists = this.$cookies.get('visited_artists');
+        if (!visited_artists.includes(url)){
+          // keep the last 9 visited artists
+          visited_artists = visited_artists.slice(Math.max(visited_artists.length - 9, 0));
+
+          visited_artists.push(url);
+          this.$cookies.set('visited_artists', JSON.stringify(visited_artists));
+        }
+      } else {
+        this.$cookies.set('visited_artists', JSON.stringify([url]));
+      }
     },
 
     expandCard() {
@@ -146,6 +191,11 @@ export default defineComponent({
 
     searchTag(tag) {
       this.$router.push({ name: "search", query: { q: `tags:${tag}` } });
+      this.$router.forward();
+    },
+
+    async findSimilar() {
+      this.$router.push({ name: "search", query: { q: `similar_docs:page_link:${this.artist.page_link.replace(/:/g, "\\:")}` } });
       this.$router.forward();
     },
 } ,
@@ -191,9 +241,7 @@ img.banner{
   grid-column-gap: 10px;
   text-decoration: none;
   color: black;
-  margin: 3vw;
-  margin-top: 0;
-  padding-bottom: 2vh;
+  margin: 0 3vw 3vw;
 }
 
 
@@ -488,6 +536,31 @@ h2.name:hover {
   display: block;
   opacity: 100%;
 }
+.find-similar {
+  position: absolute;
+  /*align the element to the right of the image*/
+  right: 27vw;
+  margin-top: 2vh;
+  z-index: 1;
+  background-color: rgb(232, 232, 232, 0.8);
+  border-radius: 100vh;
+  transition: all 0.2s;
+
+/*  invert colors*/
+}
+
+.find-similar::before {
+  content: "";
+  font-size: 0;
+  transition: all 0.2s;
+}
+
+.find-similar:hover::before {
+  content: "Find Similar";
+  font-size: 1em;
+  padding-right: 0.5rem;
+}
+
 
 
 

@@ -12,7 +12,7 @@ const routes = [
     name: 'search',
     meta: { title: 'Search results' },
     component: () => import(/* webpackChunkName: "search" */ '@/views/ResultsPage.vue')
-  }
+  },
 ]
 
 const router = createRouter({
