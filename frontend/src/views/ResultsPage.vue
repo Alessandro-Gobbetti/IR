@@ -70,7 +70,8 @@ export default defineComponent({
           stats: {
             page: 1,
             total_pages: 1,
-            total_results: result.response.docs.length
+            total_results: result.response.docs.length,
+            similar_to: result.match.docs[0].artist_name,
           },
           docs: result.response.docs
         };

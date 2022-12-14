@@ -5,8 +5,12 @@
                   :query="(this.$route.query.q===undefined?'':this.$route.query.q).split(' AND')[0]">
     </FeedbackForm>
 
-    <p class="align-self-baseline" v-if="Object.keys(results.stats).length >0">
+    <p class="align-self-baseline" v-if="Object.keys(results.stats).length >0 && results.stats.exec_time">
       Found {{results.stats.found}} results in {{parseFloat(results.stats.exec_time).toFixed(5)}} seconds.
+      <span class="font-italic" style="cursor: pointer" href="" @click="this.$refs.feedbackform.open">Not satisfied ?</span>
+    </p>
+    <p v-else-if="Object.keys(results.stats).length >0 && results.stats.similar_to">
+      Found {{results.stats.total_results}} results similar to {{results.stats.similar_to}}.
       <span class="font-italic" style="cursor: pointer" href="" @click="this.$refs.feedbackform.open">Not satisfied ?</span>
     </p>
 
@@ -16,7 +20,7 @@
                            color="black"
                            indeterminate
       ></v-progress-circular>
-        <template v-else-if="(results.docs.length)==0">
+        <template v-else-if="(results.docs.length)===0">
           <h1 class="text-center">No results found</h1>
           <h3 class="text-center">Try searching for something else</h3>
         </template>

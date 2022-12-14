@@ -178,7 +178,10 @@ export default defineComponent({
       if (this.subs_range_value[0] !== this.filter_options.subs_range[0] || this.subs_range_value[1] !== this.filter_options.subs_range[1]) {
         query_str += ` AND amount_subs:[${this.subs_range_value[0]} TO ${this.subs_range_value[1]}]`
       }
-      // TODO: Add price range
+
+      if (this.price_range_value[0] !== this.filter_options.price_range[0] || this.price_range_value[1] !== this.filter_options.price_range[1]) {
+        query_str += ` AND price_tiers_monthly_chf:[${this.price_range_value[0]} TO ${this.price_range_value[1]}]`
+      }
 
       return query_str
     },
@@ -218,7 +221,7 @@ export default defineComponent({
     async performQuery(){
       // Avoids performing a fetch if the callback function is not defined.
       if(this.onresultschange) {
-        this.onresultschange(await this.fetchResults(this.buildBackendFilterUrl(this.curr_params.q), this.queryParam.page))
+        this.onresultschange(await this.fetchResults(this.curr_params.q, this.queryParam.page))
       }
     },
     onenterkey(e) {
