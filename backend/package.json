@@ -4,7 +4,7 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "solr-init": "node devscripts/solrinit.js",
+    "solrinit": "node devscripts/solrinit.js",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -20,6 +20,7 @@
     "express-xss-sanitizer": "^1.1.6",
     "log4js": "^6.7.1",
     "method-override": "^3.0.0",
+    "mongodb": "^4.12.1",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.20",
     "solr-node": "^1.2.1"

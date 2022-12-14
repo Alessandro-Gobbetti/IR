@@ -58,8 +58,13 @@ const settings = {
         // How much to wait after scraping before starting another scrape.
         scrape_check_ms: 1000*60*60*24, // 24h
         // If scraped documents/links are older than X days, they're up for being rescraped.
-        scrape_expiry_time: 1
-    }
+        scrape_expiry_time: 5
+    },
+    mongodb: {
+        mongodb_uri: process.env.MONGODB_URI || `mongodb://localhost:27017`,
+        db_name: "IR_db",
+        collections: ["tags","searches"]
+    },
 }
 
 // Deep freezes the settings object.
