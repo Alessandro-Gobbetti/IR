@@ -1,0 +1,255 @@
+\documentclass[tikz,14pt]{article}
+
+\input{helpers.sty}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[titletoc,title]{appendix}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{latexsym}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage[linguistics]{forest}
+\usepackage{colortbl}
+\usepackage{pdfpages}
+\usepackage{wrapfig}
+\usepackage{dirtree}
+\usepackage{xifthen}% provides \isempty test
+\usepackage{glossaries}
+
+
+\definecolor{color1}{HTML}{0B0C10}
+\definecolor{color2}{HTML}{1F2833}
+\definecolor{color3}{HTML}{C5C6C7}
+\definecolor{color4}{HTML}{66FCF1}
+\definecolor{color5}{HTML}{45A29E}
+
+\pagestyle{fancy}
+\fancyhf{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% VARIABLES
+\newcommand\sitename{Banana\texttrademark}
+\newcommand\assignmenttitle{Project Report}
+\newcommand\namesurname{Albert Cerfeda\\Alessandro Gobbetti}
+\newcommand\assignment{}
+
+\newcommand\subject{Information Retrieval}
+\newcommand\documentdate{16.12.2022}
+
+% Title content
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rhead{\assignment}
+\lhead{\namesurname}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\rfoot{Page \thepage}
+\setlength{\parindent}{0pt}
+
+\newcommand\xdownarrow[1][2ex]{%
+   \mathrel{\rotatebox{90}{$\xleftarrow{\rule{#1}{0pt}}$}}
+}
+
+\begin{document}
+
+\begin{titlepage}
+   \begin{center}
+       \vspace*{1cm}
+
+       \textbf{\Large{\assignmenttitle}}
+
+       \vspace{0.5cm}
+        \textbf{\subject}\\[5mm]
+       \assignment
+        
+            
+       \vspace{1.1cm}
+
+        \namesurname\\
+        \vspace{1cm}
+
+        This project was realized in the span of about 2 weeks (14 days).\\
+Developed as part of the group project for \textit{Information Retrieval SA 2021-2022}, part of BSc INF at Università della Svizzera Italiana (USI) in Lugano.
+       \tableofcontents
+       
+
+       \vspace*{\fill}
+     
+       \includegraphics[width=0.4\textwidth]{fig/logo.pdf}
+       
+        \documentdate \\
+        Università della Svizzera italiana\\
+        Faculty of Informatics\\
+        Switzerland\\
+
+   \end{center}
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%  CONTENT START   %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% color	white, black, red, green, blue, cyan, magenta, yellow
+% thickness	ultra thin, very thin, thin, thick, very thick, ultra thick
+% dots (/loosely/densely) + dotted, dashed, dashdotted
+
+
+
+
+% - Introduction
+
+% - Tech stack
+%     - {diagram}
+%     - Scrapy
+%     - Solr
+%     - NodeJS + MongoDB
+%     - Vuejs 3
+
+% - Retrieving and indexing documents
+%     - Crawling process
+%         - Crawling
+%     - Indexing process
+%         - Indexing
+
+% - The glue that keeps everything together: the backend
+    % - Modules
+    % - Automatic scraping
+    % - Handling user queries
+
+% - Presenting documents to users: the frontend
+
+% - User evaluation: la merda
+
+% - Conclusion
+
+\section{Introduction} \label{sec:intro}
+\textbf{\sitename\footnote{Banana is not an actual trademark. We thought it was funny xd}} aims to be a search engine to discover and fund your favourite content creators.\\
+We put efforts into making our system sustainable and self-improving, without requiring us to start processes or intervene manually. We faced quite a lot of challenges, mostly regarding Solr [See Sec.\ref{sec:solr}] and its very steep learning curve.\\
+Nonetheless, we are satisfied enough with the current state of the project. There are still many improvements to be done, but considering the time on our hands this is good enough.\\
+
+
+\section{Tech stack} \label{sec:stack}
+In our system there are dfferent components that operate independently from one another. It's important to gain understanding of the moving pieces that make our system work.
+\subsection{Scrapy} \label{sec:scrapy}
+Scrapy is an open source Python framework for crawling and scraping websites \footnote{Scrapy: See \href{https://scrapy.org}{website}}. Our backend invokes the Scrapy process for crawling/scraping a set of artists, categories or search queries. The scraped data output is then directed into a \verb|.json| file, ready to be read and indexed by Solr.
+\subsection{Solr} \label{sec:solr}
+Solr is a popular enterprise search platform built on top of \textit{Apache Lucene}\footnote{Solr: See \href{https://solr.apache.org/guide/solr/9_0/index.html}{website}}. It includes features like distributed indexing, replication and load-balanced querying, and automatic recovery.\\
+It is responsible for indexing and querying the collection. It retrieves the artists most pertinent to the user's search query and filters.
+\subsection{NodeJS + MongoDB} \label{sec:node-mongo}
+For our backend we chose NodeJS \verb|v. 19.2.0|. It handles user queries, relevance feedback and coordinates and interacts with all the other components of our stack.\\
+It also handles the scraping and indexing process, as it periodically provides the Solr and Scrapy processes with the authors/tags/queries to scrape and index. The MongoDB database serves for the purpose of storing and remembering the index timestamp for each author/tag/query.\\
+The user has the option to label as "unsatisfying" the search results for a query: the backend will then instruct Scrapy to scrape the search results of each site for the provided user query.\\
+It performs additional computation on the user's query such as pagination, query reranking, sorting, "more like this" similarity feature and input sanification.\\ It also adopts some security measures like using a rate limiter to protect from DDOS attacks. See Section \ref{sec:backend} for a more detailed explanation of how the backend works.
+\subsection{Vue.js 3} \label{sec:vuejs}
+
+\section{Retrieving and indexing documents} \label{sec:retrieving}
+Retrieving and indexing documents is the core of any search engine. In this section we will describe these two processes in detail.
+
+
+
+
+\subsection{Crawling process} \label{sec:crawling}
+Retrieving documents from the web is a complex process. 
+The crawling process is used to retrieve documents from the web.
+This is done by a crawler (also called spider), that automatically visit web pages and read their content.
+When a crawler visits a web page, it extracts the links to other pages and adds them to the list of pages to visit.
+This process is repeated until the crawler has visited all the pages it can find.
+In the case of our project, we used the \href{https://scrapy.org/}{Scrapy framework} to crawl the web pages.
+
+In order to properly crawl a website we need to understand how it is structured.
+For this reason, this was a fundamental part in the project to decide which sites to crawl.
+Some websites are not meant to be crawled easily.
+
+An ideal website to crawl would have a list of links to all the pages to crawl (all the creators using the site).
+\href{https://www.subscribestar.com/stars?_page=true&page=1}{SubscibeStar} is a perfect example of this:
+the whole website is static and the creators are listed. 
+The only thing to do is visit every site in the list on every page and extract the information.
+This is not the case for most websites, and we had to find a way to crawl them.
+
+
+\href{https://www.ko-fi.com/}{Ko-fi}, for example, does not list all the creators, so we had to find another way to crawl it.
+Since creators have tags associated with them, we decided to use them and search by category.
+
+\href{https://www.patreon.com/}{Patreon} does not even have categories, 
+so we decided to query the site using random super-generic keywords (like "music" or "art").
+This way we are not sure to find all the creators, but at least we can crawl a lot of them.
+
+The crawling process is not always straightforward, and we had to make some compromises.
+When we crawl a website we are sending thousands of requests to a webserver, and we need to be careful not to overload it or get banned.
+Some websites have a limit on the number of requests per second.
+Between the three websites we crawled, href{https://www.ko-fi.com/}{Ko-fi} has the most restrictive policy.
+
+We used some good practices to safely crawl the websites. To avoid sending too many requests at the same time, we used a delay between requests.
+For the case of href{https://www.ko-fi.com/}{Ko-fi}, we set the \verb|DOWNLOAD_DELAY| to 3 seconds, 
+which means that the crawler will wait a random interval between $0.5 \cdot 3$ and $1.5 \cdot 3$ seconds 
+before sending the next request since the \verb|RANDOMIZE_DOWNLOAD_DELAY| setting is enabled (by default).
+
+Another good practice is to use a \textit{user agent} to identify the crawler.
+This is a string that is sent with every request, and it is used by the webserver to identify the client.
+The \textit{user agent} contains information about the client, like the operating system, the browser, and the version.
+To be more clear, an example of user agent is: 
+\verb|Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36|.
+At every request, our crawler uses a random user agent thanks to the \verb|scrapy.downloadermiddlewares.useragent.UserAgentMiddleware| middleware.
+
+Another problem we faced is that some websites are javascript-heavy, so we had to wait some time for the page to load.
+To solve this problem, we used the \verb|scrapy-playwright| library, which is a middleware that uses the \href{https://playwright.dev/}{Playwright} library to interact with the browser.
+It simulates a real user using a real browser, so it can wait for the page to load and interact with it. 
+We used it to wait until a css selector was present on the page, but it can do much more, like clicking on buttons or filling forms.
+
+The spiders we coded have a common structure, they can take as parameter a list of tags to search, 
+a list of urls of creators pages, or a list of queries to perform on the website.
+The default parameters are used when we want to crawl the whole website.
+The spiders have a method \mintinline{python}{parse} that is called on the pages listing artists.
+This method extracts the urls of the artists pages and calls the \mintinline{python}{parse_artist} method on them.
+It also extracts the urls of the next pages and calls itself on them.
+The \mintinline{python}{parse_artist} method is the one that extracts the information from the artist page.
+All the information are stored in the same format tanks to the \mintinline{python}{artist_dict.make} method.
+The info we save for each artist are:
+\begin{itemize}
+    \item \mintinline{python}{site}: the website we crawled (ko-fi, patreon, subscribestar)
+    \item \mintinline{python}{page_link}: the url of the artist page
+    \item \mintinline{python}{artist_name}: the name of the artist
+    \item \mintinline{python}{artist_image}: the url of the artist image
+    \item \mintinline{python}{artist_banner}: the url of the artist banner
+    \item \mintinline{python}{bio}: a short description of the artist
+    \item \mintinline{python}{bio_long}: a more detailed description of the artist
+    \item \mintinline{python}{amount_post}: the number of posts the artist has
+    \item \mintinline{python}{amount_subs}: the number of subs the artist has
+    \item \mintinline{python}{price_tiers_title}: a list of all the price tiers titles
+    \item \mintinline{python}{price_tiers_monthly}: a list of strings of all the price tiers amounts per month
+    \item \mintinline{python}{price_tiers_monthly_chf}: a list of all the price tiers amounts converted to CHF
+    \item \mintinline{python}{price_tiers_description}: a list of all the price tiers descriptions
+    \item \mintinline{python}{tags}: a list of tags associated with the artist
+    \item \mintinline{python}{socialmedias}: a list of social media links
+    \item \mintinline{python}{indexDate}: the date of the crawling
+\end{itemize}
+
+All the crawled data can be outputted by scrapy in a json file, that we use in the next section to index the data.
+
+To run the spiders, navigate to the \mintinline{bash}{crawler/crawler} folder and run the following command:
+\begin{minted}{bash}
+scrapy crawl <spider-name> [OPTIONAL PARAMETERS] -o outputfile.json
+\end{minted} 
+where \mintinline{bash}{<spider-name>} is the name of the spider you want to run,
+and \mintinline{bash}{outputfile.json} is the name of the file where the data will be saved.
+The optional parameters can be passed as \mintinline{bash}{-a tags=[...] -a artists=[...] -a searches=[...]}.
+
+
+
+\subsection{Indexing process} \label{sec:indexing}
+Once the data is crawled, we need to index it to then be able to search it.
+We use the Apache Solr search engine to do so. 
+
+\section{The glue that keeps everything together: the backend} \label{sec:backend}
+\subsection{Automatic scraping} \label{sec:scraping}
+\subsection{Handling user queries} \label{sec:queries}
+
+\section{Presenting documents to users: the frontend} \label{sec:frontend}
+
+\section{User evaluation: la merda} \label{sec:evaluation}
+
+\section{Conclusion}
+
+
+
+\clearpage
+
+
+\end{document}
