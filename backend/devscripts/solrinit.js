@@ -20,7 +20,7 @@ indexFiles(['subscribestar-v5.json','kofi-v5.json','patreon-v3.json']).then(()=>
  * @returns {Promise<void>} resolves when the indexing is done.
  */
 async function indexFiles(files) {
-    await solr.deleteAllDocuments()
+    await solr.deleteAllDocuments().then(console.log).catch(console.log)
 
     for (const file of files) {
         const filepath = path.join(scrapy.scrapy_json_output_dir, file)

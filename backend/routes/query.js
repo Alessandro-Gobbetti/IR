@@ -15,6 +15,7 @@ const mongodb = require("../modules/mongodb")
  * @returns {Object} the Solr JSON query object.
  */
 function parse_query_fields(obj) {
+
     let res = {
         query : obj.q,
         offset: Math.max(0,(obj.page-1||0))*config.solr.query.page_size
@@ -29,11 +30,9 @@ function tokenizeQuery(queryFull) {
     if(queryFull === undefined || !queryFull.q)
         return
 
-    let [query, filters] = queryFull.q.split(" AND ");
+    let query = queryFull.q.split(" AND ")[0];
+    let filters = queryFull.q.split(" AND ").slice(1).join(" AND ")
 
-    if (!query)
-        return
-    console.log(query, filters)
     let query_arr = query.split(' ');
     for (let i = 0; i < query_arr.length; i++) {
         let word = query_arr[i];
@@ -49,7 +48,7 @@ function tokenizeQuery(queryFull) {
             query_arr[i] = `*${word}*`;
         }
     }
-    return {q: query_arr.join(' ') + (filters ? " AND "+filters : "")};
+    return {...queryFull, q: query_arr.join(' ') + (filters ? (query.length > 0 ? " AND ": "") +filters : "")};
 }
 
 
@@ -136,6 +135,7 @@ router.get('/*', async function (req, res) {
         },
         fields: "*,score"
     }
+        console.log("Params:", params)
 
     // Search documents using objQuery
     solr.runSearchQuery(params)

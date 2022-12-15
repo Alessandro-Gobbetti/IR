@@ -141,8 +141,8 @@ async function getStatistics() {
             "min_subs" : "min(amount_subs)",
             "max_subs" : "max(amount_subs)",
 
-            "min_price" : "min(price_tiers_monthly)",
-            "max_price" : "max(price_tiers_monthly)",
+            "min_price" : "min(price_tiers_monthly_chf)",
+            "max_price" : "max(price_tiers_monthly_chf)",
         },
         limit: 0
     }).then(data=> {
@@ -171,7 +171,7 @@ async function getStatistics() {
  * @returns {Promise<void>} resolves when the operation is completed.
  */
 async function deleteAllDocuments() {
-    console.log(await runDeleteQuery({query: "*:*"}))
+    return runDeleteQuery({query: "*:*"})
 }
 
 module.exports = {
