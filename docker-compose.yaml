@@ -1,0 +1,59 @@
+version: '3.8'
+services:
+  solr:
+    image: solr:9.0.0
+    volumes:
+      - ./data/solr:/var/solr/data
+      - ./solr/creators_configset:/opt/solr-9.0.0/server/solr/configsets/_default:ro
+    entrypoint: ["/bin/sh","-c"]
+    command:
+      - solr start -cloud
+      - solr create -c creators -d _default -shards 2 -rf 2 -p 8983
+      - | 
+        /usr/bin/curl -X POST -H 'Content-type:application/json' -d '{ \
+        "add-requesthandler": {
+          "name": "/mlt",
+          "class": "solr.MoreLikeThisHandler", 
+          "defaults": {"mlt.fl": "body"}
+        }}' http://localhost:8983/solr/creators/config"
+      - sleep infinity
+
+  # alpine:
+  #   image: alpine
+  #   entrypoint: "sleep infinity"
+  #   networks:
+  #     - mongodb-network
+
+  backend:
+    build: backend/
+    entrypoint: yarn start
+    volumes:
+      # - ./backend:/usr/app/
+      - /usr/app/node_modules
+    # ports:
+      # - "8888:8888"
+    depends_on:
+      - mongodb
+      - solr
+    networks:
+      - mongodb-network
+    environment:
+      - MONGODB_URI=mongodb
+    # ports:
+
+
+  mongodb:
+    image : mongo
+    container_name: mongodb
+    # environment:
+    volumes:
+      - ./data/mongo-database:/data/db
+    networks:
+      - mongodb-network
+    # ports: # Iff needed to be accessed locally
+    #   - "27017:27017"
+    
+
+networks:
+  mongodb-network:
+    driver: bridge  
