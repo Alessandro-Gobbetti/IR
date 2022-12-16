@@ -2,7 +2,7 @@ SOLRPORT=8983
 SOLRCOLLECTION=creators
 
 solr-9.0.0/:
-	unzip solr-9.0.0.zip
+	cp -r solr-9.0.0.bak solr-9.0.0
 	rm -r solr-9.0.0/server/solr/configsets/_default/conf
 	cp -r creators_configset/conf solr-9.0.0/server/solr/configsets/_default/
 
