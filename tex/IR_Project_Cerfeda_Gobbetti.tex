@@ -148,6 +148,9 @@ Nonetheless, we are satisfied enough with the current state of the project. Ther
 
 
 \section{Tech stack} \label{sec:stack}
+\begin{figure}[h!]
+    \includegraphics*[width=\linewidth]{fig/StackDiagram.png}
+\end{figure}
 In our system there are dfferent components that operate independently from one another. It's important to gain understanding of the moving pieces that make our system work.
 
 \subsection{Scrapy} \label{sec:scrapy}
@@ -164,7 +167,11 @@ The user has the option to label as "unsatisfying" the search results for a quer
 It performs additional computation on the user's query such as pagination, query reranking, sorting, "more like this" similarity feature and input sanification.\\ It also adopts some security measures like using a rate limiter to protect from DDOS attacks. See Section \ref{sec:backend} for a more detailed explanation of how the backend works.
 
 \subsection{Vue.js 3} \label{sec:vuejs}
-The frontend plays the crucial part of presenting the retrieved documents
+The frontend plays the crucial part of presenting the retrieved documents. 
+It is responsible for the user interface, the user experience and the interaction with the backend. 
+It is built with Vue.js 3, using Vuetify 3 as a UI library. Vue.js allows us to create a reactive and dynamic user interface, while Vuetify provides us with a set of pre-built components and styles.\\
+During the development of the frontend, we discover that the Vuetify library is not yet fully finished and stable. This caused us some problems, but we managed to overcome them.\\
+
 
 \section{Retrieving and indexing documents} \label{sec:retrieving}
 Retrieving and indexing documents is the core of any search engine. In this section we will describe these two processes in detail.
@@ -269,13 +276,28 @@ Once the data are crawled, we need to index it to then be able to find the docum
 We use the Apache Solr search engine to do so, which is an open-source search engine that uses the Lucene library to build an inverted index.
  
 \section{The glue that keeps everything together: the backend} \label{sec:backend}
+Our backend is center of operations. It starts and administers most of the processes that happen on the server, hidden from the user.
+
 \subsection{Automatic scraping} \label{sec:scraping}
+The backend relies on a MongoDB database for storing the index dates of tags and for storing the search queries searched for on the different sites.\\
+All the configuration options for the backend are stored inside the \textit{config.json} file. There you can customize almost every aspect of the application, like the page size, how much time needs to pas for considering a document as expired and therefore put it up for scraping.\\
+
+The backend uses a \textit{rate limiter} for limiting the amount of received requests, ensuring some degree of protection from DDoS attacks.
+
 \subsection{Handling user queries} \label{sec:queries}
-
-
-
-
-
+There are different API endpoints available to the frontend:\\
+\begin{enumerate}
+\item /query/feedback
+With this route the user can provide explcit feedback for the search results of a query.\\
+Once a user is dissatisfied with a query's search results, the query in question is saved into MongoDB to be automatically earched for and indexed for on the different sites.
+\item /query/stats
+This route allows the frontend to retrieve all statistics of the collection. This way the frontend can display the filters with the appropriate values and display the categories that are most popular on the homepage.
+\item /query/mlt
+This route is used by the frontend for retrieving artists that are similar to a set of other artist(s). We used the "More Like This" method handler in Solr.
+\item /query/*
+Finally the most useful route: here the user can provide search query terms and filter values and the backend answers with the ranked documents.\\
+A very interesting query preprocessing is done: All the words of the query are escaped with starts (ie '*') therefore enabling partial query matching. If a user types a query term escaped with quotes (ie "quote") the backend performs an EXACT query match for those words. This feature was clearly inspired to Google's Search engine.\\
+\end{enumerate}
 
 \section{Presenting documents to users: the frontend} \label{sec:frontend}
 The search engine is not the only part of an IR system, we also need to present the documents to the user and 
@@ -415,6 +437,21 @@ Given the results of the SUS questionnaire, we can say that the system is defini
 
 
 \section{How to run} \label{sec:howtorun}
+The code of the system is available on GitHub at \url{https://github.com/Alessandro-Gobbetti/IR}.
+
+To run the crawler, navigate to the \mintinline{bash}{crawler/crawler} folder and run:
+
+\mintinline{bash}{scrapy crawl <spider-name> -o outputfile.json} (see \autoref{sec:crawling} for more info).
+
+To init solr just navigate to the \mintinline{bash}{solr} folder and run \mintinline{bash}{make}.
+This will start the solr instance on port 8983, creates a collection called \verb|creators| with the proper schema.
+The MoreLikeThis handler is also added.
+
+To start the backend, navigate to the \mintinline{bash}{backend} folder, install the dependencies with \mintinline{bash}{yarn install} and run \mintinline{bash}{yarn run start}.
+By running \mintinline{bash}{yarn run solrinit} the backend clears the Solr collection and reindexes all the data.
+
+To start the frontend, navigate to the \mintinline{bash}{frontend} folder, install the dependencies with \mintinline{bash}{yarn install} and run \mintinline{bash}{yarn run start}.
+
 
 
 \section{Conclusion}
@@ -430,6 +467,7 @@ The information shown are all the ones describin the artist, so in many cases th
 
 The user can also perform complex queries to find the artists that best fit their needs.
 Since the crawling does not guarantee that all the artists are crawled, the user can also specify the query to be performed on the websites to improve the system.
+
 
 
 
