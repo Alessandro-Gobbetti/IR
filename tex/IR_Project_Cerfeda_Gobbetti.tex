@@ -17,6 +17,28 @@
 \usepackage{dirtree}
 \usepackage{xifthen}% provides \isempty test
 \usepackage{glossaries}
+\usepackage{pgfplots}
+
+\definecolor{darkblue}{rgb}{0.0, 0.0, 1}
+\usepackage[pdftex,hyperfigures,hyperindex,bookmarksnumbered,colorlinks, bookmarks, breaklinks, linktocpage,citecolor=darkblue,urlcolor=darkblue,linkcolor=darkblue,pagebackref=true]{hyperref}
+
+% to fixme
+\definecolor{FIXMECOLOR}{rgb}{1,0,0.3}
+\newcommand{\FIXME}[1]{{\color{FIXMECOLOR}{\textbf{FIXME: #1}}}} 
+
+% code blocks
+\definecolor{LightGray}{gray}{0.95}
+\usepackage{minted}
+\setminted[]{
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\small,
+    linenos,
+    mathescape=true,
+    escapeinside=||,
+}
 
 
 \definecolor{color1}{HTML}{0B0C10}
@@ -127,17 +149,22 @@ Nonetheless, we are satisfied enough with the current state of the project. Ther
 
 \section{Tech stack} \label{sec:stack}
 In our system there are dfferent components that operate independently from one another. It's important to gain understanding of the moving pieces that make our system work.
+
 \subsection{Scrapy} \label{sec:scrapy}
 Scrapy is an open source Python framework for crawling and scraping websites \footnote{Scrapy: See \href{https://scrapy.org}{website}}. Our backend invokes the Scrapy process for crawling/scraping a set of artists, categories or search queries. The scraped data output is then directed into a \verb|.json| file, ready to be read and indexed by Solr.
+
 \subsection{Solr} \label{sec:solr}
 Solr is a popular enterprise search platform built on top of \textit{Apache Lucene}\footnote{Solr: See \href{https://solr.apache.org/guide/solr/9_0/index.html}{website}}. It includes features like distributed indexing, replication and load-balanced querying, and automatic recovery.\\
 It is responsible for indexing and querying the collection. It retrieves the artists most pertinent to the user's search query and filters.
+
 \subsection{NodeJS + MongoDB} \label{sec:node-mongo}
 For our backend we chose NodeJS \verb|v. 19.2.0|. It handles user queries, relevance feedback and coordinates and interacts with all the other components of our stack.\\
 It also handles the scraping and indexing process, as it periodically provides the Solr and Scrapy processes with the authors/tags/queries to scrape and index. The MongoDB database serves for the purpose of storing and remembering the index timestamp for each author/tag/query.\\
 The user has the option to label as "unsatisfying" the search results for a query: the backend will then instruct Scrapy to scrape the search results of each site for the provided user query.\\
 It performs additional computation on the user's query such as pagination, query reranking, sorting, "more like this" similarity feature and input sanification.\\ It also adopts some security measures like using a rate limiter to protect from DDOS attacks. See Section \ref{sec:backend} for a more detailed explanation of how the backend works.
+
 \subsection{Vue.js 3} \label{sec:vuejs}
+The frontend plays the crucial part of presenting the retrieved documents
 
 \section{Retrieving and indexing documents} \label{sec:retrieving}
 Retrieving and indexing documents is the core of any search engine. In this section we will describe these two processes in detail.
@@ -177,16 +204,19 @@ Some websites have a limit on the number of requests per second.
 Between the three websites we crawled, href{https://www.ko-fi.com/}{Ko-fi} has the most restrictive policy.
 
 We used some good practices to safely crawl the websites. To avoid sending too many requests at the same time, we used a delay between requests.
-For the case of href{https://www.ko-fi.com/}{Ko-fi}, we set the \verb|DOWNLOAD_DELAY| to 3 seconds, 
+For the case of href{https://www.ko-fi.com/}{Ko-fi}, we set the \mintinline{python}{DOWNLOAD_DELAY} to 3 seconds,
 which means that the crawler will wait a random interval between $0.5 \cdot 3$ and $1.5 \cdot 3$ seconds 
-before sending the next request since the \verb|RANDOMIZE_DOWNLOAD_DELAY| setting is enabled (by default).
+before sending the next request since the \mintinline{python}{RANDOMIZE_DOWNLOAD_DELAY} setting is enabled (by default).
 
 Another good practice is to use a \textit{user agent} to identify the crawler.
 This is a string that is sent with every request, and it is used by the webserver to identify the client.
 The \textit{user agent} contains information about the client, like the operating system, the browser, and the version.
 To be more clear, an example of user agent is: 
-\verb|Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36|.
-At every request, our crawler uses a random user agent thanks to the \verb|scrapy.downloadermiddlewares.useragent.UserAgentMiddleware| middleware.
+\begin{minted}[fontsize=\footnotesize]{bash}
+Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36
+\end{minted}
+At every request, thanks to the \mintinline{python}{scrapy.downloadermiddlewares.useragent.UserAgentMiddleware} middleware
+our crawler uses a random user agent.
 
 Another problem we faced is that some websites are javascript-heavy, so we had to wait some time for the page to load.
 To solve this problem, we used the \verb|scrapy-playwright| library, which is a middleware that uses the \href{https://playwright.dev/}{Playwright} library to interact with the browser.
@@ -226,26 +256,181 @@ All the crawled data can be outputted by scrapy in a json file, that we use in t
 To run the spiders, navigate to the \mintinline{bash}{crawler/crawler} folder and run the following command:
 \begin{minted}{bash}
 scrapy crawl <spider-name> [OPTIONAL PARAMETERS] -o outputfile.json
-\end{minted} 
+\end{minted}
 where \mintinline{bash}{<spider-name>} is the name of the spider you want to run,
 and \mintinline{bash}{outputfile.json} is the name of the file where the data will be saved.
+
 The optional parameters can be passed as \mintinline{bash}{-a tags=[...] -a artists=[...] -a searches=[...]}.
 
 
 
 \subsection{Indexing process} \label{sec:indexing}
-Once the data is crawled, we need to index it to then be able to search it.
-We use the Apache Solr search engine to do so. 
-
+Once the data are crawled, we need to index it to then be able to find the documents that match a query.
+We use the Apache Solr search engine to do so, which is an open-source search engine that uses the Lucene library to build an inverted index.
+ 
 \section{The glue that keeps everything together: the backend} \label{sec:backend}
 \subsection{Automatic scraping} \label{sec:scraping}
 \subsection{Handling user queries} \label{sec:queries}
 
-\section{Presenting documents to users: the frontend} \label{sec:frontend}
 
-\section{User evaluation: la merda} \label{sec:evaluation}
+
+
+
+
+\section{Presenting documents to users: the frontend} \label{sec:frontend}
+The search engine is not the only part of an IR system, we also need to present the documents to the user and 
+provide a way for them to interact with the documents, perform queries and in general brouse the system.
+The frontend does it.
+
+The homepage shown in \autoref{fig:homepage} contains a search bar where the user can type a query and press enter to perform it.
+Some of the most popular tags are also shown, and the user can click on them to quickly retrieve the documents associated with them.
+The user can also click on the \textit{Advanced search} button to perform a more complex query: 
+a form is shown below the search bar where the user can specify the websites they want to search in,
+the categories the artists must belong to, the amount of subs they must have (through a range slider), 
+and a range of prices the artists must offer (through a range slider again).
+The user can specify an exact match for the words in the query by putting them in double quotes, 
+otherwise  
+The query is performed when the user clicks enter in the search bar.
+
+
+\begin{figure}[H]
+    \centering
+    % add box around figure
+    \fbox{\includegraphics[width=0.9\linewidth]{fig/homepage.png}}
+    \caption{The homepage of the website.}
+    \label{fig:homepage}
+\end{figure}
+
+The results are shown in a list of cards (see \autoref{fig:resultspage}) sorted by the score of the documents, which is computed by Solr.
+Each card contains the most important information about the artist and the user can click on a card to expand it 
+and see more information about the artist and the price tiers they offer.
+The words in the artist bio and description matching the query are highlighted in bold.
+It is also possible to click on the artist name or profile picture to be redirected to their page on the website.
+Links to the social media accounts are also shown, and the user can click on them to be redirected to the artist's social media page.
+The tags associated with the artist are clickable and clicking on them will perform a new query with the clicked tag as a filter.
+On the top right of the expanded card, there is a button that allows the user to sarch for artists similar to the one shown in the card.
+At the bottom of the page, there is a pagination bar that allows the user to navigate through the results.
+
+\begin{figure}[H]
+    \centering
+    % add box around figure
+    \fbox{\includegraphics[width=0.9\linewidth]{fig/resutlspage.png}}
+    \caption{The results page.}
+    \label{fig:resultspage}
+\end{figure}
+
+
+On top of the results page, there is the same search bar as in the homepage, so the user can quickly perform a new query.
+If the user clicks on the logo at the top left of the page, they will be redirected to the homepage.
+On the right side of the page, insted, a list of artists is shown. These are the creators that the user might find interesting.
+To compute this list, we keep track using cookies of the last 10 artists the user has clicked on, and we show the 10 artists that are most similar to them.
+Since these information are stored in the cookies, the user is not identified and his/her privacy is preserved.
+The similarity is computed by Solr using the \mintinline{bash}{mlt} (More Like This) query parser, which is a query parser that returns documents similar to the ones specified in the query.
+
+The query and the filters are stored in the URL of the page, so the user can easily share the results of a query with someone else.
+
+
+\section{User evaluation: how good is our search engine?} \label{sec:evaluation}
+As a good practice, once we have built a search engine, we need to evaluate it to see how good it is.
+
+% System usability scale
+We used the standard System Usability Scale (SUS) questionnaire to evaluate the usability of our system.
+The SUS questionnaire is a 10-item questionnaire that measures the usability of a system.
+Each question is rated on a 5-point Likert scale, from \textit{strongly disagree} to \textit{strongly agree}.
+At the end of the questionnaire, we can compute the SUS score, which is a number between 0 and 100 that indicates how usable the system is.
+
+Two extra questions were added to the questionnaire to evaluate more specifically the system:
+\begin{itemize}
+    \item \textit{I found what I was looking for?}
+    \item \textit{I completed successfully all tasks?}
+\end{itemize}
+
+We asked 3 users to use the system and fill the SUS questionnaire.
+While using the system we asked them to perform some tasks, such as searching for artists, clicking on links and expanding cards.
+
+The users where pretty confident in using the system, and they were able to perform the tasks we asked them to do.
+They also started to use the system on their own to browse the artists and find the ones they were interested in, without us asking them to do specific tasks.
+
+
+
+% 4 4 5 | 1
+% 1 2 2 | 2
+% 5 5 5 | 3
+% 1 1 2 | 4
+% 5 5 5 | 5
+% 1 1 1 | 6
+% 4 4 5 | 7
+% 1 1 1 | 8
+% 5 5 4 | 9
+% 1 1 1 | 10
+% 5 5 5 | 11
+% 5 5 5 | 12
+
+% 95 92.5 92.5
+
+
+
+\begin{figure}
+    \begin{tikzpicture}
+        \begin{axis}[
+            width=\textwidth, 
+            height=0.5\textwidth,
+            xlabel=Question,
+            ylabel=Score (1-5) avg between 3 users,
+            ytick={1,2,3,4,5},
+            xtick={1,2,3,4,5,6,7,8,9,10,11,12},
+            ymin=0,
+            % grid
+            grid=both,
+        ]
+            \addplot+[ybar, fill=blue!, draw=blue!, bar width=0.5cm] coordinates {
+                (1, 13/3)
+                (2, 5/3)
+                (3, 15/3)
+                (4, 4/3)
+                (5, 15/3)
+                (6, 3/3)
+                (7, 13/3)
+                (8, 3/3)
+                (9, 14/3)
+                (10, 3/3)
+                (11, 15/3)
+                (12, 15/3)
+            };
+        \end{axis}
+    \end{tikzpicture}
+    \caption{The SUS questionnaire.}
+    \label{fig:sus}
+\end{figure}
+
+The results of the SUS questionnaire are shown in \autoref{fig:sus}.
+The average score for each question is computed by dividing the sum of the scores given by the 3 users by 3.
+The SUS score can then be computed (ignoring the last two quesitons). 
+The SUS scores are 95, 92.5 and 92.5, which leads to an average SUS score of 93.33, a pretty good score, considering that the SUS score is between 0 and 100.
+
+The users also answered the two extra questions we added to the questionnaire that were more specific for a search engine.
+The testers were very satisfied with the results of their queries, and they were able to complete all the tasks they were asked to do.
+
+Given the results of the SUS questionnaire, we can say that the system is definitely usable and that the users are satisfied with it.
+
+
+\section{How to run} \label{sec:howtorun}
+
 
 \section{Conclusion}
+
+To conclude this report, we can say that we have successfully built a search engine for content creators on the internet.
+The system is able to crawl the web and index the data, and it is able to perform queries and return the results to the user.
+The backend automatically updates the data every $n$ days, so the user can always find the most up-to-date information about the artists.
+The system is also able to recommend artists similar to the ones the user is interested in, and it is able to show the most popular tags.
+
+The data retrieved are presented in a nice way to the user, and the user can easily interact with them expanding the cards
+to see more information and clicking the links to the artists' pages.
+The information shown are all the ones describin the artist, so in many cases the user does not even need to click on the link to the artist's page.
+
+The user can also perform complex queries to find the artists that best fit their needs.
+Since the crawling does not guarantee that all the artists are crawled, the user can also specify the query to be performed on the websites to improve the system.
+
 
 
 
